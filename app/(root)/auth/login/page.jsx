@@ -23,6 +23,7 @@ import z from "zod";
 import { FaEye, FaEyeSlash, FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
 import Link from "next/link";
+import { WEBSITE_REGISTER } from "@/routes/WebsiteRoute";
 
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
@@ -120,7 +121,7 @@ const LoginPage = () => {
 
             <div className="flex items-center justify-center gap-2">
               <span>Don't have an account?</span>
-              <Link href={"/auth/register"} className="text-blue-600 underline">
+              <Link href={WEBSITE_REGISTER} className="text-blue-600 underline">
                 Create an Account
               </Link>
             </div>
