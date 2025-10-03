@@ -22,6 +22,7 @@ import ButtonLoading from "@/components/application/ButtonLoading";
 import z from "zod";
 import { FaEye, FaEyeSlash, FaRegEye } from "react-icons/fa";
 import { FaRegEyeSlash } from "react-icons/fa";
+import Link from "next/link";
 
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
@@ -101,7 +102,7 @@ const LoginPage = () => {
                   <button
                     type="button"
                     className="absolute top-1/2 right-4 cursor-pointer"
-                    onClick={() => (setIsTypePassword(!isTypePassword))}
+                    onClick={() => setIsTypePassword(!isTypePassword)}
                   >
                     {isTypePassword ? <FaEyeSlash /> : <FaEye />}
                   </button>
@@ -117,11 +118,18 @@ const LoginPage = () => {
               loading={loading}
             />
 
-            <div className="flex gap-5">
+            <div className="flex items-center justify-center gap-2">
               <span>Don't have an account?</span>
-              {/* <Link to={RouteSignup} className="text-blue-600 underline">Signup</Link> */}
+              <Link href={"/auth/register"} className="text-blue-600 underline">
+                Create an Account
+              </Link>
             </div>
           </form>
+          <div className="mt-3">
+            <Link href={""} className="text-blue-600 underline">
+              Forgot password?
+            </Link>
+          </div>
         </Form>
       </CardContent>
     </Card>
