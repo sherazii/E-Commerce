@@ -20,9 +20,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { zSchema } from "@/lib/zodSchema";
 import ButtonLoading from "@/components/application/ButtonLoading";
 import z from "zod";
+import { FaEye, FaEyeSlash, FaRegEye } from "react-icons/fa";
+import { FaRegEyeSlash } from "react-icons/fa";
 
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
+  const [isTypePassword, setIsTypePassword] = useState(true);
   const formSchema = zSchema
     .pick({
       email: true,
@@ -86,15 +89,22 @@ const LoginPage = () => {
               control={form.control}
               name="password"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="relative">
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="************"
-                      type="password"
+                      type={isTypePassword ? "password" : "text"}
                       {...field}
                     />
                   </FormControl>
+                  <button
+                    type="button"
+                    className="absolute top-1/2 right-4 cursor-pointer"
+                    onClick={() => (setIsTypePassword(!isTypePassword))}
+                  >
+                    {isTypePassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
                   <FormMessage />
                 </FormItem>
               )}
