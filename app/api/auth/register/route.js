@@ -1,6 +1,5 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { zSchema } from "@/lib/zodSchema";
-import { NextResponse } from "next/server";
 import { response } from "./../../../../lib/helperFunction";
 import UserModel from "@/models/User.model";
 
