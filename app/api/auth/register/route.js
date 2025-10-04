@@ -1,9 +1,10 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { zSchema } from "@/lib/zodSchema";
-import { response } from "@/lib/helperFunction";
+import { catchError, response } from "@/lib/helperFunction";
 import UserModel from "@/models/User.model";
 import { SignJWT } from "jose";
 import { sendMail } from "@/lib/sendMail";
+import { emailVerificationLink } from "@/email/emailVerificationLink";
 
 export async function POST(request) {
   try {
@@ -15,7 +16,7 @@ export async function POST(request) {
       password: true,
     });
 
-    const payload = await request.json(); // ✅ FIXED
+    const payload = await request.json();
 
     const validatedData = validationSchema.safeParse(payload);
     if (!validatedData.success) {
@@ -29,7 +30,7 @@ export async function POST(request) {
 
     const { name, email, password } = validatedData.data;
 
-    // ✅ FIXED: Await check
+    // Check if user exists
     const checkUser = await UserModel.exists({ email });
     if (checkUser) {
       return response(false, 409, "User already exists");
@@ -39,17 +40,33 @@ export async function POST(request) {
     const newRegistration = new UserModel({ name, email, password });
     await newRegistration.save();
 
-    // Generate JWT
+    // Generate verification token
     const secret = new TextEncoder().encode(process.env.SECRET_KEY);
     const token = await new SignJWT({ userId: newRegistration._id })
       .setIssuedAt()
-      .setExpirationTime("1h")
+      .setExpirationTime("24h") // ✅ allow more time to verify
       .setProtectedHeader({ alg: "HS256" })
       .sign(secret);
 
-      await sendMail("Email verification request from Sheraz Hashmi")
-    return response(true, 201, "User registered successfully", { token });
+    // Send verification email
+    const mailResult = await sendMail(
+      "Email verification request from Sheraz Hashmi",
+      email,
+      emailVerificationLink(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/verify-email/${token}`
+      )
+    );
+
+    if (!mailResult.success) {
+      return response(false, 500, "Registration succeeded but failed to send verification email");
+    }
+
+    return response(
+      true,
+      201,
+      "Registration successful. Please verify your email address."
+    );
   } catch (error) {
-    return response(false, 500, "Server error", error.message);
+    return catchError(error); // ✅ must return
   }
 }
