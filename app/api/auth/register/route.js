@@ -30,35 +30,38 @@ export async function POST(request) {
 
     const { name, email, password } = validatedData.data;
 
-    // Check if user exists
     const checkUser = await UserModel.exists({ email });
     if (checkUser) {
       return response(false, 409, "User already exists");
     }
 
-    // New Registration
     const newRegistration = new UserModel({ name, email, password });
     await newRegistration.save();
 
-    // Generate verification token
-    const secret = new TextEncoder().encode(process.env.SECRET_KEY);
+    const secretKey = process.env.SECRET_KEY;
+    if (!secretKey) throw new Error("SECRET_KEY missing in .env.local");
+
+    const secret = new TextEncoder().encode(secretKey);
     const token = await new SignJWT({ userId: newRegistration._id })
       .setIssuedAt()
-      .setExpirationTime("24h") // ✅ allow more time to verify
+      .setExpirationTime("24h")
       .setProtectedHeader({ alg: "HS256" })
       .sign(secret);
 
-    // Send verification email
     const mailResult = await sendMail(
       "Email verification request from Sheraz Hashmi",
       email,
       emailVerificationLink(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/verify-email/${token}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/verify-email/${token}`
       )
     );
 
     if (!mailResult.success) {
-      return response(false, 500, "Registration succeeded but failed to send verification email");
+      return response(
+        false,
+        500,
+        "Registration succeeded but failed to send verification email"
+      );
     }
 
     return response(
@@ -67,6 +70,7 @@ export async function POST(request) {
       "Registration successful. Please verify your email address."
     );
   } catch (error) {
-    return catchError(error); // ✅ must return
+    console.error("🔥 Register API error:", error);
+    return catchError(error);
   }
 }
