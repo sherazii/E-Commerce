@@ -23,6 +23,7 @@ import z from "zod";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import Link from "next/link";
 import { WEBSITE_LOGIN } from "@/routes/WebsiteRoute";
+import axios from "axios";
 
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
@@ -53,13 +54,40 @@ const LoginPage = () => {
     },
   });
 
-  // Login submit handler
-  const LoginSubmitHandler = async (values) => {
-    const {confirmPassword, ...data} = values;
-    console.log(data);
-    
+  // Registration form submit handler
+const RegisterSubmitHandler = async (values) => {
+  try {
+    // Exclude confirmPassword before sending to backend
+    const { confirmPassword, ...data } = values;
+
+    setLoading(true);
+
+    // ✅ Call backend API to register new user
+    const { data: registerResponse } = await axios.post(
+      "/api/auth/register",
+      data
+    );
+
+    // ✅ If backend reports failure, throw an error to be caught below
+    if (!registerResponse.success) {
+      throw new Error(registerResponse.message || "Registration failed");
+    }
+
+    // ✅ Reset the form after successful registration
     form.reset();
-  };
+
+    // Show success message
+    alert(registerResponse.message);
+
+  } catch (error) {
+    // ✅ Handle both backend and network errors gracefully
+    alert(error?.response?.data?.message || error.message || "Something went wrong");
+  } finally {
+    // ✅ Always stop loading state (success or error)
+    setLoading(false);
+  }
+};
+
 
   return (
     <Card className="w-120 text-center">
@@ -81,7 +109,7 @@ const LoginPage = () => {
       <CardContent>
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(LoginSubmitHandler)}
+            onSubmit={form.handleSubmit(RegisterSubmitHandler)}
             className="space-y-8"
           >
             {/* Name */}
