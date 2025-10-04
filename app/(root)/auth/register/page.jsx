@@ -25,7 +25,7 @@ import Link from "next/link";
 import { WEBSITE_LOGIN } from "@/routes/WebsiteRoute";
 import axios from "axios";
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const [loading, setLoading] = useState(false);
   const [isTypePassword, setIsTypePassword] = useState(true);
 
@@ -214,4 +214,4 @@ const RegisterSubmitHandler = async (values) => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;
