@@ -26,8 +26,11 @@ import OTPVerification from "@/components/application/OTPVerification";
 import { zSchema } from "@/lib/zodSchema";
 import { showToast } from "@/lib/showToast";
 import { WEBSITE_REGISTER } from "@/routes/WebsiteRoute";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "@/store/reducer/authSlice";
 
 const LoginPage = () => {
+  const dispatch = useDispatch();  
   const [loading, setLoading] = useState(false);
   const [otpVerificationLoading, setOtpVerificationLoading] = useState(false);
   const [otpEmail, setOtpEmail] = useState();
@@ -100,6 +103,7 @@ const LoginPage = () => {
 
       // ✅ Show success message
       showToast("success", otpResponse.message);
+      dispatch(login(otpResponse.data))
     } catch (error) {
       // ✅ Handle both backend and network errors gracefully
       const errorMessage =

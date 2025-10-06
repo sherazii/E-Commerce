@@ -38,10 +38,10 @@ export async function POST(request) {
     const newRegistration = new UserModel({ name, email, password });
     await newRegistration.save();
 
-    const secretKey = process.env.SECRET_KEY;
+    const secretKey = process.env.SECRET_KEY;//Details needed
     if (!secretKey) throw new Error("SECRET_KEY missing in .env.local");
 
-    const secret = new TextEncoder().encode(secretKey);
+    const secret = new TextEncoder().encode(secretKey); 
     const token = await new SignJWT({ userId: newRegistration._id })
       .setIssuedAt()
       .setExpirationTime("24h")

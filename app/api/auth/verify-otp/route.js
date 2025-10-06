@@ -88,7 +88,7 @@ export async function POST(request) {
      */
     const cookieStore = await cookies();
     cookieStore.set({
-      name: "AccessToken", // ✅ cookie names should not contain spaces
+      name: "access_token", // ✅ cookie names should not contain spaces
       value: token,
       httpOnly: true,
       path: "/",
