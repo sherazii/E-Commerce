@@ -7,6 +7,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import verifiedImg from "@/public/assets/images/verified.gif";
 import unVerifiedImg from "@/public/assets/images/verification-failed.gif";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { WEBSITE_HOME } from "@/routes/WebsiteRoute";
 
 const EmailVerificationPage = () => {
   const { token } = useParams(); // ✅ Get the token from the URL
@@ -64,6 +67,7 @@ const EmailVerificationPage = () => {
               <p className="mt-4 text-lg font-semibold text-green-600">
                 {message}
               </p>
+              <Button asChild><Link href={WEBSITE_HOME}>Contineu Shopping</Link></Button>
             </div>
           )}
 
