@@ -1,8 +1,15 @@
-"use client"; // 👈 Important: makes this a Client Component
+"use client";
+
 import React, { useState } from "react";
 import Image from "next/image";
-import Logo from "@/public/assets/images/logo-black.png";
+import Link from "next/link";
+import axios from "axios";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
+import Logo from "@/public/assets/images/logo-black.png";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Form,
@@ -14,19 +21,11 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { zSchema } from "@/lib/zodSchema";
 import ButtonLoading from "@/components/application/ButtonLoading";
-import z from "zod";
-import { FaEye, FaEyeSlash, FaRegEye } from "react-icons/fa";
-import { FaRegEyeSlash } from "react-icons/fa";
-import Link from "next/link";
-import { WEBSITE_REGISTER } from "@/routes/WebsiteRoute";
-import { showToast } from "@/lib/showToast";
-import axios from "axios";
 import OTPVerification from "@/components/application/OTPVerification";
+import { zSchema } from "@/lib/zodSchema";
+import { showToast } from "@/lib/showToast";
+import { WEBSITE_REGISTER } from "@/routes/WebsiteRoute";
 
 const LoginPage = () => {
   const [loading, setLoading] = useState(false);
@@ -82,25 +81,25 @@ const LoginPage = () => {
   };
 
   //OTP Verification handler
-  const OtpVerficationHandler = async (values) => {
+  const OtpVerficationHandler = async (data) => {
     try {
       setOtpVerificationLoading(true);
 
       // ✅ Call backend API to log in the user
-      const { data: loginResponse } = await axios.post(
+      const { data: otpResponse } = await axios.post(
         "/api/auth/verify-otp",
         data
       );
 
       // ✅ If backend reports failure, throw an error to trigger catch block
-      if (!loginResponse.success) {
-        throw new Error(loginResponse.message || "Login failed");
+      if (!otpResponse.success) {
+        throw new Error(otpResponse.message || "Login failed");
       }
 
       setOtpEmail("");
 
       // ✅ Show success message
-      showToast("success", loginResponse.message);
+      showToast("success", otpResponse.message);
     } catch (error) {
       // ✅ Handle both backend and network errors gracefully
       const errorMessage =
@@ -167,7 +166,7 @@ const LoginPage = () => {
                       </FormControl>
                       <button
                         type="button"
-                        className="absolute top-1/2 right-4 cursor-pointer"
+                        className="absolute right-4 top-[38px] cursor-pointer"
                         onClick={() => setIsTypePassword(!isTypePassword)}
                       >
                         {isTypePassword ? <FaEyeSlash /> : <FaEye />}

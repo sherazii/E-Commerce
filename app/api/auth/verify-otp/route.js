@@ -12,6 +12,7 @@ import { cookies } from "next/headers";
  * @access  Public (after OTP request)
  */
 export async function POST(request) {
+    
   try {
     /** 
      * 🧩 Step 1: Connect to the database
@@ -27,6 +28,7 @@ export async function POST(request) {
       email: true,
     });
 
+    
     const validatedData = validationSchema.safeParse(payload);
     if (!validatedData.success) {
       return response(
@@ -36,8 +38,8 @@ export async function POST(request) {
         validatedData.error
       );
     }
-
     const { email, otp } = validatedData.data;
+    
 
     /** 
      * 🧩 Step 3: Verify OTP validity in the database
