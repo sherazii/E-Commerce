@@ -25,7 +25,7 @@ import ButtonLoading from "@/components/application/ButtonLoading";
 import OTPVerification from "@/components/application/OTPVerification";
 import { zSchema } from "@/lib/zodSchema";
 import { showToast } from "@/lib/showToast";
-import { WEBSITE_REGISTER } from "@/routes/WebsiteRoute";
+import { WEBSITE_REGISTER, WEBSITE_RESETPASSWORD } from "@/routes/WebsiteRoute";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "@/store/reducer/authSlice";
 
@@ -198,7 +198,7 @@ const LoginPage = () => {
                 </div>
               </form>
               <div className="mt-3">
-                <Link href={""} className="text-blue-600 underline">
+                <Link href={WEBSITE_RESETPASSWORD} className="text-blue-600 underline">
                   Forgot password?
                 </Link>
               </div>

@@ -70,9 +70,14 @@ const UserSchema = new mongoose.Schema(
 
 // 🔐 Hash password before saving (only when modified)
 UserSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  this.password = await bcrypt.hash(this.password, 10);
-  next();
+  try {
+    if (!this.isModified("password")) return next();
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 // 🔍 Compare plain text password with hashed password
