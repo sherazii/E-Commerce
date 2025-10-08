@@ -25,12 +25,16 @@ import ButtonLoading from "@/components/application/ButtonLoading";
 import OTPVerification from "@/components/application/OTPVerification";
 import { zSchema } from "@/lib/zodSchema";
 import { showToast } from "@/lib/showToast";
-import { WEBSITE_REGISTER, WEBSITE_RESETPASSWORD } from "@/routes/WebsiteRoute";
+import { USER_DASHBOARD, WEBSITE_REGISTER, WEBSITE_RESETPASSWORD } from "@/routes/WebsiteRoute";
 import { useDispatch, useSelector } from "react-redux";
 import { login } from "@/store/reducer/authSlice";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ADMIN_DASHBOARD } from "@/routes/AdminPanelRoute";
 
 const LoginPage = () => {
-  const dispatch = useDispatch();  
+  const dispatch = useDispatch();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [otpVerificationLoading, setOtpVerificationLoading] = useState(false);
   const [otpEmail, setOtpEmail] = useState();
@@ -103,7 +107,12 @@ const LoginPage = () => {
 
       // ✅ Show success message
       showToast("success", otpResponse.message);
-      dispatch(login(otpResponse.data))
+      dispatch(login(otpResponse.data));
+      if (searchParams.has("callback")) {
+        router.push(searchParams.get("callback"));
+      }else{
+        otpResponse.data.role === 'admin' ? router.push(ADMIN_DASHBOARD): router.push(USER_DASHBOARD)
+      }
     } catch (error) {
       // ✅ Handle both backend and network errors gracefully
       const errorMessage =
@@ -198,7 +207,10 @@ const LoginPage = () => {
                 </div>
               </form>
               <div className="mt-3">
-                <Link href={WEBSITE_RESETPASSWORD} className="text-blue-600 underline">
+                <Link
+                  href={WEBSITE_RESETPASSWORD}
+                  className="text-blue-600 underline"
+                >
                   Forgot password?
                 </Link>
               </div>
