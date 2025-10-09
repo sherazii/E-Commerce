@@ -1,6 +1,14 @@
 import { ToastContainer } from "react-toastify";
 import "./globals.css";
 import GlobalProvider from "@/components/application/GlobalProvider";
+import { Varela_Round } from "next/font/google";  // ✅ Import Google Font
+
+// Configure the font
+const varela = Varela_Round({
+  subsets: ["latin"],  // required subset
+  weight: "400",       // optional
+  display: "swap",     // for better performance
+});
 
 export const metadata = {
   title: "Create Next App",
@@ -11,7 +19,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`antialiased font-[M_PLUS_Rounded]`}
+        className={`${varela.className} antialiased`}  // ✅ apply font globally
         suppressHydrationWarning={true}
       >
         <GlobalProvider>
