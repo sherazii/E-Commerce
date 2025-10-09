@@ -1,21 +1,22 @@
 import BreadCrumb from "@/components/application/admin/BreadCrumb";
+import UploadMedia from "@/components/application/admin/UploadMedia";
 import React from "react";
-import AdminDashboard from "../dashboard/page";
 
 const breadCrumbData = [
   {
-    href: '/admin/dashboard',
+    href: "/admin/dashboard",
     label: "Home",
   },
   {
-    href: '',
+    href: "",
     label: "Media",
   },
 ];
 const MediaPage = () => {
   return (
     <div>
-      <BreadCrumb breadCrumbData={breadCrumbData}/>
+      <BreadCrumb breadCrumbData={breadCrumbData} />
+      <UploadMedia />
     </div>
   );
 };

@@ -1,13 +1,14 @@
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // ✅ ensure Toastify styles are imported
 import "./globals.css";
 import GlobalProvider from "@/components/application/GlobalProvider";
-import { Varela_Round } from "next/font/google";  // ✅ Import Google Font
+import { Varela_Round } from "next/font/google"; // ✅ built-in font import
 
-// Configure the font
+// ✅ Configure Google Font (built-in)
 const varela = Varela_Round({
-  subsets: ["latin"],  // required subset
-  weight: "400",       // optional
-  display: "swap",     // for better performance
+  subsets: ["latin"],
+  weight: ["400"],
+  display: "swap",
 });
 
 export const metadata = {
@@ -19,8 +20,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${varela.className} antialiased`}  // ✅ apply font globally
-        suppressHydrationWarning={true}
+        className={`${varela.className} antialiased`} // ✅ apply font globally
+        suppressHydrationWarning
       >
         <GlobalProvider>
           <ToastContainer />
