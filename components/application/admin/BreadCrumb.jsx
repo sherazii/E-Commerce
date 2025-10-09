@@ -8,21 +8,27 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 
-const BreadCrumb = () => {
+const BreadCrumb = ({ breadCrumbData = [] }) => {
+  if (!breadCrumbData.length) return null; // prevent rendering empty breadcrumbs
+
   return (
-    <Breadcrumb>
+    <Breadcrumb className="mb-5">
       <BreadcrumbList>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/">Home</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/components">Components</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbSeparator />
-        <BreadcrumbItem>
-          <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
-        </BreadcrumbItem>
+        {breadCrumbData.map((item, index) => {
+          const isLast = index === breadCrumbData.length - 1;
+          return (
+            <React.Fragment key={index}>
+              <BreadcrumbItem>
+                {isLast ? (
+                  <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                ) : (
+                  <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
+                )}
+              </BreadcrumbItem>
+              {!isLast && <BreadcrumbSeparator />}
+            </React.Fragment>
+          );
+        })}
       </BreadcrumbList>
     </Breadcrumb>
   );
