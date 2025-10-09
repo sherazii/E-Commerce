@@ -4,6 +4,7 @@ import { CldUploadWidget } from "next-cloudinary";
 import { Button } from "@/components/ui/button";
 import { FiPlus } from "react-icons/fi";
 import { showToast } from "@/lib/showToast";
+import axios from "axios";
 const UploadMedia = ({ isMultiple }) => {
   const errorHandler = (error) => {
     showToast("error", error.statusText);
@@ -19,9 +20,17 @@ const UploadMedia = ({ isMultiple }) => {
         path: file.uploadInfo.path,
         thumbnail_url: file.uploadInfo.thumbnail_url,
       }));
-      if(uploadedFiles.length > 0){
-        
+    if (uploadedFiles.length > 0) {
+      try {
+        const { data: mediaUploadResponse } = await axios.post(
+          "/api/media/create", uploadedFiles
+        );
+        if(!mediaUploadResponse.success){throw new Error(mediaUploadResponse.message)}
+        showToast('success', mediaUploadResponse.message)
+      } catch (error) {
+        showToast("error", error.message);
       }
+    }
   };
   return (
     <CldUploadWidget

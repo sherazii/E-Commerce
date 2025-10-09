@@ -12,7 +12,7 @@ export async function POST(request) {
       process.env.CLOUDINARY_API_SECRET
     );
 
-    return NextResponse.json({ signature });
+    return NextResponse.json({ signature});
   } catch (error) {
     return catchError(error);
   }
