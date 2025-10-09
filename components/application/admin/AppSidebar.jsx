@@ -69,9 +69,11 @@ const AppSidebar = () => {
                 <Collapsible key={index} className="group/collapsible">
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
-                      <SidebarMenuButton className="flex gap-2 items-center cursor-pointer font-semibold px-2 py-5">
+                      <SidebarMenuButton  >
+                        <Link href={menu.url} className="flex gap-2 items-center cursor-pointer font-semibold px-2 py-5">
                         <menu.icon />
                         {menu.title}
+                        </Link>
                         {/* Dropdown arrow rotates on open */}
                         {menu.submenu && menu.submenu.length > 0 && (
                           <LuChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
