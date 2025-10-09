@@ -4,7 +4,7 @@ import { IoMdClose } from "react-icons/io";
 import { LuChevronRight } from "react-icons/lu";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import {
   Sidebar,
   SidebarContent,
@@ -18,6 +18,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   Collapsible,
@@ -29,15 +30,16 @@ import LogoBlack from "@/public/assets/images/logo-black.png";
 import LogoWhite from "@/public/assets/images/logo-white.png";
 
 const AppSidebar = () => {
+  const { toggleSidebar } = useSidebar();
   return (
-    <Sidebar>
+    <Sidebar className={""}>
       {/* ─── Sidebar Header ─────────────────────────────── */}
       <SidebarHeader className="border-b h-14 p-0">
         <div className="flex justify-between items-center px-4">
           <Image
             src={LogoBlack}
             width={50}
-            className="block dark:hidden h-[50px] w-auto" 
+            className="block dark:hidden h-[50px] w-auto"
             alt="logo dark"
           />
 
@@ -47,7 +49,12 @@ const AppSidebar = () => {
             className="hidden dark:block h-[50px] w-auto"
             alt="logo white"
           />
-          <Button type="button" size="icon">
+          <Button
+            type="button"
+            size="icon"
+            className="md:hidden"
+            onClick={toggleSidebar}
+          >
             <IoMdClose />
           </Button>
         </div>
@@ -62,7 +69,7 @@ const AppSidebar = () => {
                 <Collapsible key={index} className="group/collapsible">
                   <SidebarMenuItem>
                     <CollapsibleTrigger asChild>
-                      <SidebarMenuButton className="flex gap-2 items-center cursor-pointer font-semibold px-2 py-5" >
+                      <SidebarMenuButton className="flex gap-2 items-center cursor-pointer font-semibold px-2 py-5">
                         <menu.icon />
                         {menu.title}
                         {/* Dropdown arrow rotates on open */}
@@ -78,7 +85,10 @@ const AppSidebar = () => {
                         <SidebarMenuSub>
                           {menu.submenu.map((item, subIndex) => (
                             <SidebarMenuSubItem key={subIndex}>
-                              <SidebarMenuSubButton asChild className="cursor-pointer px-2 py-5">
+                              <SidebarMenuSubButton
+                                asChild
+                                className="cursor-pointer px-2 py-5"
+                              >
                                 {/* ✅ Submenu uses Link correctly now */}
                                 <Link href={item.url}>{item.title}</Link>
                               </SidebarMenuSubButton>
