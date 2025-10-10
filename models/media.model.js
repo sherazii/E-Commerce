@@ -2,23 +2,29 @@ import mongoose from "mongoose";
 
 const mediaSchema = new mongoose.Schema(
   {
-    assetId: {
+    asset_id: {
       type: String,
       required: true,
-      unique: true,
+      unique: true, // creates an index automatically
+      trim: true,
+    },
+    public_id: {
+      type: String,
+      required: true,
+      unique: true, // creates an index automatically
       trim: true,
     },
     path: {
       type: String,
       required: true,
     },
-    thumbnail: {
-      type: String, // URL or file path for thumbnail image
-      default: null,
-    },
-    url: {
+    secure_url: {
       type: String,
       required: true,
+    },
+    thumbnail_url: {
+      type: String,
+      default: null,
     },
     alt: {
       type: String,
@@ -36,9 +42,10 @@ const mediaSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // adds createdAt and updatedAt
+    timestamps: true,
   }
 );
+
 
 const MediaModel =
   mongoose.models.Media || mongoose.model("Media", mediaSchema, "medias");
