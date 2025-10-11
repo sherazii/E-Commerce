@@ -21,12 +21,12 @@ export async function GET(request) {
     const deleteType = searchParams.get("deleteType");
 
     // ✅ Build filter based on deleteType (SD = Soft Deleted?, PD = Permanently Deleted?)
-    let filter = {}; // <-- Default filter should be empty, NOT undefined
+    let filter = {};
 
     if (deleteType === "SD") {
-      filter = { deleteAt: null }; // Items NOT deleted
+      filter = { deletedAt: null };
     } else if (deleteType === "PD") {
-      filter = { deleteAt: { $ne: null } }; // Items marked as deleted
+      filter = { deletedAt: { $ne: null } };
     }
 
     // ✅ Fetch paginated media list

@@ -24,6 +24,7 @@ const Media = ({
   selectedMedia,
   setSelectedMedia,
 }) => {
+  
   // ✅ Toggle selection on checkbox
   const handleCheck = (checked) => {
     if (checked) {
@@ -77,7 +78,7 @@ const Media = ({
                 </DropdownMenuItem>
               </>
             )}
-            <DropdownMenuItem asChild className={"cursor-pointer"}>
+            <DropdownMenuItem asChild className={"cursor-pointer"} onClick={() => {handleDelete([media._id], deleteType)}}>
               <span>
                 <FaTrashAlt color="red" />{" "}
                 {deleteType === "SD"

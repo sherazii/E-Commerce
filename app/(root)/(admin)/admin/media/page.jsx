@@ -14,7 +14,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 const breadCrumbData = [
   { href: "/admin/dashboard", label: "Home" },
@@ -60,7 +60,8 @@ const MediaPage = () => {
     status,
   } = useInfiniteQuery({
     queryKey: ["media-data", deleteType],
-    queryFn: async ({ pageParam = 0 }) => await fetchMedia(pageParam, deleteType),
+    queryFn: async ({ pageParam = 0 }) =>
+      await fetchMedia(pageParam, deleteType),
     initialPageParam: 0,
     getNextPageParam: (lastPage, pages) => {
       // lastPage.hasMore should be provided by your API (true/false)
@@ -72,12 +73,14 @@ const MediaPage = () => {
   const handleDelete = (selectedIds, type) => {
     let confirmed = true;
     if (type === "PD") {
-      confirmed = confirm("Are you sure you want to delete this data permanently?");
+      confirmed = confirm(
+        "Are you sure you want to delete this data permanently?"
+      );
     }
 
     if (confirmed) {
       // keep your deleteMutation API usage untouched
-      deleteMutation.mutate({ids:selectedIds, deleteType:type});
+      deleteMutation.mutate({ ids: selectedIds, deleteType: type });
     }
 
     // reset selections after action
@@ -118,7 +121,9 @@ const MediaPage = () => {
               <div className="flex gap-3">
                 {deleteType === "SD" ? (
                   <Button type="button" variant="destructive">
-                    <Link href={`${ADMIN_MEDIA_SHOW}?trashof=media`}>Trash</Link>
+                    <Link href={`${ADMIN_MEDIA_SHOW}?trashof=media`}>
+                      Trash
+                    </Link>
                   </Button>
                 ) : (
                   <Button type="button">
@@ -179,8 +184,10 @@ const MediaPage = () => {
           ) : (
             <div className="grid lg:grid-cols-5 sm:grid-cols-3 grid-cols-2 gap-2 mb-5">
               {/* map pages and media items directly (no unnecessary Fragment) */}
-              {data?.pages?.map((page, pageIndex) =>
-                page.mediaData.map((media) => (
+              {/* ✅ Flatten pages and filter correctly */}
+              {data?.pages
+                ?.flatMap((page) => page.mediaData || [])
+                .map((media) => (
                   <Media
                     key={media._id}
                     media={media}
@@ -189,8 +196,7 @@ const MediaPage = () => {
                     selectedMedia={selectedMedia}
                     setSelectedMedia={setSelectedMedia}
                   />
-                ))
-              )}
+                ))}
             </div>
           )}
 
