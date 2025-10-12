@@ -1,9 +1,15 @@
-import React from 'react'
+"use client"
+import useFetch from "@/hooks/useFetch";
+import React, { use } from "react";
 
-const EditMedia = () => {
-  return (
-    <div>EditMedia</div>
-  )
-}
+const EditMedia = ({ params }) => {
+  const { id } = use(params);
 
-export default EditMedia
+  const {data: mediaData}= useFetch(`/api/media/get/${id}`)
+  console.log(mediaData);
+  
+  
+  return <div>EditMedia</div>;
+};
+
+export default EditMedia;
