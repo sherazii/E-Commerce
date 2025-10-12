@@ -17,7 +17,6 @@ export async function PUT(request) {
 
     // ✅ DB Connection
     await connectDB();
-    
 
     // ✅ Extract payload
     const { ids = [], deleteType } = await request.json();
@@ -32,7 +31,6 @@ export async function PUT(request) {
     if (!media.length) {
       return response(false, 400, "Data not found");
     }
-    
 
     // ✅ Validate deleteType
     if (!["SD", "RSD"].includes(deleteType)) {
@@ -43,7 +41,6 @@ export async function PUT(request) {
       );
     }
 
-    
     // ✅ Soft Delete or Restore
     if (deleteType === "SD") {
       await MediaModel.updateMany(
@@ -56,8 +53,6 @@ export async function PUT(request) {
         { $set: { deletedAt: null } }
       );
     }
-
-    
 
     return response(
       true,
@@ -107,9 +102,11 @@ export async function DELETE(request) {
     await MediaModel.deleteMany({ _id: { $in: ids } }).session(session);
 
     // ✅ Delete from Cloudinary
-    const publicIds = media.map((m) => m.public_id);
+    const public_ids = media.map((m) => m.public_id);
     try {
-      await cloudinary.api.delete_resources(publicIds);
+      await cloudinary.api.delete_resources(public_ids, {
+        resource_type: "image",
+      });
     } catch (error) {
       await session.abortTransaction();
       session.endSession();
