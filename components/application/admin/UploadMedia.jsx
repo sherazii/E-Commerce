@@ -7,7 +7,7 @@ import { FiPlus } from "react-icons/fi";
 import { showToast } from "@/lib/showToast";
 import axios from "axios";
 
-const UploadMedia = ({ isMultiple }) => {
+const UploadMedia = ({ isMultiple, queryClient }) => {
   // 🔹 Handle Cloudinary upload errors
   const errorHandler = (error) => {
     showToast("error", error?.statusText || "Upload failed");
@@ -38,6 +38,7 @@ const UploadMedia = ({ isMultiple }) => {
           throw new Error(mediaUploadResponse.message);
         }
 
+        queryClient.invalidateQueries('media-data')
         showToast("success", mediaUploadResponse.message);
       } catch (error) {
         showToast("error", error.message);
@@ -55,7 +56,7 @@ const UploadMedia = ({ isMultiple }) => {
         cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
         sources: ["local", "url", "unsplash", "google_drive"],
         multiple: isMultiple,
-        maxFiles: 5,
+        maxFiles: 20,
       }}
     >
       {({ open }) => (

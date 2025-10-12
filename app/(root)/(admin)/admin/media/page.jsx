@@ -10,11 +10,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import useDeleteMutation from "@/hooks/useDeleteMutation";
 import { ADMIN_MEDIA_SHOW } from "@/routes/AdminPanelRoute";
 import { Label } from "@/components/ui/label"; // switched to your UI label
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
+import ButtonLoading from "@/components/application/ButtonLoading";
 
 const breadCrumbData = [
   { href: "/admin/dashboard", label: "Home" },
@@ -23,6 +24,7 @@ const breadCrumbData = [
 
 const MediaPage = () => {
   // deleteType: "SD" = normal media view, "PD" = trash view
+  const queryClient = useQueryClient();
   const [deleteType, setDeleteType] = useState("SD");
   const [selectedMedia, setSelectedMedia] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
@@ -116,7 +118,9 @@ const MediaPage = () => {
             </h4>
 
             <div className="flex items-center gap-5">
-              {deleteType === "SD" && <UploadMedia />}
+              {deleteType === "SD" && (
+                <UploadMedia isMultiple={true} queryClient={queryClient} />
+              )}
 
               <div className="flex gap-3">
                 {deleteType === "SD" ? (
@@ -182,25 +186,45 @@ const MediaPage = () => {
           ) : status === "error" ? (
             <p>Error: {error?.message || "Something went wrong"}</p>
           ) : (
-            <div className="grid lg:grid-cols-5 sm:grid-cols-3 grid-cols-2 gap-2 mb-5">
-              {/* map pages and media items directly (no unnecessary Fragment) */}
-              {/* ✅ Flatten pages and filter correctly */}
+            <>
               {data?.pages
                 ?.flatMap((page) => page.mediaData || [])
-                .map((media) => (
-                  <Media
-                    key={media._id}
-                    media={media}
-                    handleDelete={handleDelete}
-                    deleteType={deleteType}
-                    selectedMedia={selectedMedia}
-                    setSelectedMedia={setSelectedMedia}
-                  />
-                ))}
-            </div>
+                .map((media) => media._id).length === 0 ? (
+                <div className="mx-auto w-full text-center my-5 text-3xl font-bold">
+                  No Media found
+                </div>
+              ) : (
+                <div className="grid lg:grid-cols-5 sm:grid-cols-3 grid-cols-2 gap-2 mb-5">
+                  {/* map pages and media items directly (no unnecessary Fragment) */}
+                  {/* ✅ Flatten pages and filter correctly */}
+                  {data?.pages
+                    ?.flatMap((page) => page.mediaData || [])
+                    .map((media, idx) => (
+                      <Media
+                        key={idx}
+                        media={media}
+                        handleDelete={handleDelete}
+                        deleteType={deleteType}
+                        selectedMedia={selectedMedia}
+                        setSelectedMedia={setSelectedMedia}
+                      />
+                    ))}
+                </div>
+              )}
+            </>
           )}
 
           {/* Optionally trigger fetchNextPage from UI or on scroll — left as-is */}
+          <div className="flex items-center justify-center my-10">
+            {hasNextPage && (
+              <ButtonLoading
+                type="button"
+                loading={isFetching}
+                onClick={() => fetchNextPage()}
+                text="Load More"
+              />
+            )}
+          </div>
         </CardContent>
       </Card>
     </div>
