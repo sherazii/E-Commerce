@@ -1,7 +1,8 @@
-import { catchError, isAuthenticated, response } from "@/lib/helperFunction";
+import { catchError, response } from "@/lib/helperFunction";
 import { connectDB } from "@/lib/databaseConnection"; // ✅ You forgot to import this
 import MediaModel from "@/models/media.model";
 import { NextResponse } from "next/server";
+import { isAuthenticated } from "@/lib/serverHelper";
 
 export async function GET(request) {
   try {
