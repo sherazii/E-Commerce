@@ -12,7 +12,6 @@ export async function GET(request) {
         if (!auth.isAuthenticated) {
           return response(false, 403, "Unauthorised");
         }
-    
         // ✅ Connect to DB
         await connectDB();
 

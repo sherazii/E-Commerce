@@ -20,7 +20,7 @@ const BreadCrumb = ({ breadCrumbData = [] }) => {
             <React.Fragment key={index}>
               <BreadcrumbItem>
                 {isLast ? (
-                  <BreadcrumbPage>{item.label}</BreadcrumbPage>
+                  <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
                 ) : (
                   <BreadcrumbLink href={item.href}>{item.label}</BreadcrumbLink>
                 )}
