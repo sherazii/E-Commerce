@@ -16,7 +16,9 @@ import {
   DeleteForever,
   DeleteOutline,
   DeleteOutlineOutlined,
+  DeleteOutlineSharp,
   RestoreFromTrash,
+  RestoreFromTrashOutlined,
   SaveAlt,
 } from "@mui/icons-material";
 import useDeleteMutation from "@/hooks/useDeleteMutation";
@@ -74,7 +76,7 @@ const Datatable = ({
         fieldSeparator: ",",
         decimalSeparator: ".",
         useKeysAsHeaders: true,
-        filename: `${queryKey}-data`,
+        filename: `${queryKey}`,
       });
 
       let csv;
@@ -209,6 +211,50 @@ const Datatable = ({
               </IconButton>
             </Link>
           </Tooltip>
+        )}
+        {deleteType === "SD" && (
+          <Tooltip title="Delete All">
+            <IconButton
+              disabled={
+                !table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()
+              }
+              onClick={() =>
+                handleDelete(Object.keys(rowSelection), deleteType)
+              }
+            >
+              <DeleteOutlineSharp />
+            </IconButton>
+          </Tooltip>
+        )}
+        {deleteType === "PD" && (
+          <>
+            <Tooltip title="Restore Data">
+              <IconButton
+                disabled={
+                  !table.getIsSomeRowsSelected() &&
+                  !table.getIsAllRowsSelected()
+                }
+                onClick={() =>
+                  handleDelete(Object.keys(rowSelection), deleteType)
+                }
+              >
+                <RestoreFromTrashOutlined />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete Permanentaly">
+              <IconButton
+                disabled={
+                  !table.getIsSomeRowsSelected() &&
+                  !table.getIsAllRowsSelected()
+                }
+                onClick={() =>
+                  handleDelete(Object.keys(rowSelection), deleteType)
+                }
+              >
+                <DeleteOutlineSharp />
+              </IconButton>
+            </Tooltip>
+          </>
         )}
       </Box>
     ),
