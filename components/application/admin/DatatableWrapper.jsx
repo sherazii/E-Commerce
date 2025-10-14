@@ -3,7 +3,7 @@ import { ThemeProvider } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import Datatable from "./Datatable";
 import { useTheme } from "next-themes";
-import { darkTheme, lightTheme } from "@/lib/meterialTheme";
+import { darkTheme, lightTheme } from "@/lib/materialTheme";
 
 const DatatableWrapper = ({
   queryKey,
@@ -16,13 +16,14 @@ const DatatableWrapper = ({
   trashView,
   createAction,
 }) => {
-  const resolvedTheme = useTheme();
+  const { resolvedTheme } = useTheme(); // ✅ FIXED
   const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted) return null;
+  if (!mounted) return null; // prevents hydration mismatch
 
   return (
     <ThemeProvider theme={resolvedTheme === "dark" ? darkTheme : lightTheme}>
