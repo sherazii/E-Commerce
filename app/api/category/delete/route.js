@@ -33,12 +33,20 @@ export async function PUT(request) {
 
     // ✅ Validate deleteType
     if (!["SD", "RSD"].includes(deleteType)) {
-      return response(false, 400, "deleteType must be SD (Soft Delete) or RSD (Restore)");
+      return response(
+        false,
+        400,
+        "deleteType must be SD (Soft Delete) or RSD (Restore)"
+      );
     }
 
     // ✅ Soft Delete or Restore using updateMany
-    const updateValue = deleteType === "SD" ? { deletedAt: new Date() } : { deletedAt: null };
-    await CategoryModel.updateMany({ _id: { $in: ids } }, { $set: updateValue });
+    const updateValue =
+      deleteType === "SD" ? { deletedAt: new Date() } : { deletedAt: null };
+    await CategoryModel.updateMany(
+      { _id: { $in: ids } },
+      { $set: updateValue }
+    );
 
     return response(
       true,
@@ -72,7 +80,11 @@ export async function DELETE(request) {
 
     // ✅ Validate deleteType strictly for permanent delete
     if (deleteType !== "PD") {
-      return response(false, 400, "deleteType must be PD for permanent deletion");
+      return response(
+        false,
+        400,
+        "deleteType must be PD for permanent deletion"
+      );
     }
 
     // ✅ Confirm data exists

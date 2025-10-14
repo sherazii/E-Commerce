@@ -4,6 +4,7 @@ const categorySchema = new mongoose.Schema(
   {
     name: { type: String, required: true, unique: true },
     slug: { type: String, required: true, unique: true },
+    deletedAt: { type: Date, default: null }, // ✅ Soft delete field
   },
   { timestamps: true }
 );

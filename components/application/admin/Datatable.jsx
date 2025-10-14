@@ -120,6 +120,8 @@ const Datatable = ({
     },
     placeholderData: keepPreviousData,
   });
+  console.log(data);
+  
 
   // === Table Config ===
   const table = useMaterialReactTable({
