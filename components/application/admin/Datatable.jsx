@@ -68,6 +68,7 @@ const Datatable = ({
     }
   };
 
+
   // === CSV Export ===
   const handleExport = async (selectedRows) => {
     setExportLoading(true);
@@ -120,8 +121,6 @@ const Datatable = ({
     },
     placeholderData: keepPreviousData,
   });
-  console.log(data);
-  
 
   // === Table Config ===
   const table = useMaterialReactTable({
@@ -236,9 +235,7 @@ const Datatable = ({
                   !table.getIsSomeRowsSelected() &&
                   !table.getIsAllRowsSelected()
                 }
-                onClick={() =>
-                  handleDelete(Object.keys(rowSelection), deleteType)
-                }
+                onClick={() => handleDelete(Object.keys(rowSelection), "RSD")}
               >
                 <RestoreFromTrashOutlined />
               </IconButton>
