@@ -14,6 +14,7 @@ import React, { useState } from "react";
 import RecyclingIcon from "@mui/icons-material/Recycling";
 import {
   DeleteForever,
+  DeleteOutline,
   DeleteOutlineOutlined,
   RestoreFromTrash,
   SaveAlt,
@@ -50,7 +51,6 @@ const Datatable = ({
 
   // === Delete Handler (Safely deferring selection reset) ===
   const handleDelete = (selectedIds, type) => {
-    
     const confirmed =
       type === "PD"
         ? confirm("Are you sure you want to delete this data permanently?")
@@ -112,6 +112,7 @@ const Datatable = ({
       url.searchParams.set("filters", JSON.stringify(columnFilters ?? []));
       url.searchParams.set("globalFilter", globalFilter ?? "");
       url.searchParams.set("sorting", JSON.stringify(sorting ?? []));
+      url.searchParams.set("deleteType", deleteType);
       const { data: response } = await axios.get(url.href);
       return response;
     },
