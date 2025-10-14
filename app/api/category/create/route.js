@@ -35,7 +35,7 @@ export async function POST(request) {
     }
 
     // ✅ Create category
-    await Category.create({ name, slug });
+    await CategoryModel.create({ name, slug });
 
     return response(true, 200, "Category created successfully");
   } catch (error) {

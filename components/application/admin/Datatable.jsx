@@ -2,7 +2,7 @@ import { Box, IconButton, Tooltip } from "@mui/material";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import {
-    MaterialReactTable,
+  MaterialReactTable,
   MRT_ShowHideColumnsButton,
   MRT_ToggleDensePaddingButton,
   MRT_ToggleFullScreenButton,
@@ -34,40 +34,39 @@ const Datatable = ({
   trashView,
   createAction,
 }) => {
-  //manage our own state for stuff we want to pass to the API
+  // === Table State Management ===
   const [columnFilters, setColumnFilters] = useState([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const [sorting, setSorting] = useState([]);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: initialPageSize,
   });
   const [rowSelection, setRowSelection] = useState({});
   const [exportLoading, setExportLoading] = useState(false);
 
-  // Delete handler (keeps your mutate signature)
+  // === Deletion Hook ===
   const deleteMutation = useDeleteMutation(queryKey, deleteEndpoint);
 
-  //Delete method
-  const deleteHandler = (selectedIds, type) => {
-    let confirmed = true;
-    if (type === "PD") {
-      confirmed = confirm( 
-        "Are you sure you want to delete this data permanently?"
-      );
-    }
+  // === Delete Handler (Safely deferring selection reset) ===
+  const handleDelete = (selectedIds, type) => {
+    
+    const confirmed =
+      type === "PD"
+        ? confirm("Are you sure you want to delete this data permanently?")
+        : true;
 
     if (confirmed) {
-      // keep your deleteMutation API usage untouched
       deleteMutation.mutate({ ids: selectedIds, deleteType: type });
-      setRowSelection({});
-    }
 
-    // reset selections after action
-    setSelectAll(false);
-    setSelectedMedia([]);
+      // ✅ Avoid React warning by deferring state update
+      setTimeout(() => {
+        setRowSelection({});
+      }, 0);
+    }
   };
-  //Export method
+
+  // === CSV Export ===
   const handleExport = async (selectedRows) => {
     setExportLoading(true);
     try {
@@ -75,53 +74,36 @@ const Datatable = ({
         fieldSeparator: ",",
         decimalSeparator: ".",
         useKeysAsHeaders: true,
-        filename: "CSV-Data",
+        filename: `${queryKey}-data`,
       });
 
       let csv;
-      if(Object.keys(rowSelection).length  > 0){
-        // export only selected rows 
-        const rowData = selectedRows.map((row) => row.original)
-        csv = generateCsv(csvConfig)(rowData)
-
-      }else{
-        // Export all data
-        const {data: response } = await axios.get(exportEndpoint)
-        if(!response.success){throw new Error(response.message)}
-
-        const rowData = response.data 
-        csv = generateCsv(csvConfig)(rowData)
+      if (Object.keys(rowSelection).length > 0) {
+        const rowData = selectedRows.map((row) => row.original);
+        csv = generateCsv(csvConfig)(rowData);
+      } else {
+        const { data: response } = await axios.get(exportEndpoint);
+        if (!response.success) throw new Error(response.message);
+        csv = generateCsv(csvConfig)(response.data);
       }
-      download(csvConfig)(csv)
-    } catch (error) {
-      console.log(error);
-      showToast("error", error.message);
+      download(csvConfig)(csv);
+    } catch (err) {
+      showToast("error", err.message);
     } finally {
       setExportLoading(false);
     }
   };
-  //consider storing this code in a custom hook (i.e useFetchUsers)
+
+  // === Data Fetching with React Query ===
   const {
-    data: { data = [], meta } = {}, //your data and api response will probably be different
+    data: { data = [], meta } = {},
     isError,
     isRefetching,
     isLoading,
-    refetch,
   } = useQuery({
-    queryKey: [
-      queryKey,
-      {
-        columnFilters, //refetch when columnFilters changes
-        globalFilter, //refetch when globalFilter changes
-        pagination, //refetch when pagination changes
-        sorting, //refetch when sorting changes
-      },
-    ],
-
+    queryKey: [queryKey, { columnFilters, globalFilter, pagination, sorting }],
     queryFn: async () => {
       const url = new URL(fetchUrl, process.env.NEXT_PUBLIC_BASE_URL);
-
-      //read our state and pass it to the API as query params
       url.searchParams.set(
         "start",
         `${pagination.pageIndex * pagination.pageSize}`
@@ -130,41 +112,74 @@ const Datatable = ({
       url.searchParams.set("filters", JSON.stringify(columnFilters ?? []));
       url.searchParams.set("globalFilter", globalFilter ?? "");
       url.searchParams.set("sorting", JSON.stringify(sorting ?? []));
-
-      //use whatever fetch library you want, fetch, axios, etc
       const { data: response } = await axios.get(url.href);
       return response;
     },
-    placeholderData: keepPreviousData, //don't go to 0 rows when refetching or paginating to next page
+    placeholderData: keepPreviousData,
   });
 
-  //Table initialization
+  // === Table Config ===
   const table = useMaterialReactTable({
     columns: columnConfig,
     data,
     enableRowSelection: true,
     columnsFilterDisplayMode: "popover",
     paginationDisplayMode: "pages",
-    enableColumnOrdring: true,
+    enableColumnOrdering: true,
     enableStickyHeader: true,
     enableStickyFooter: true,
-
     initialState: { showColumnFilters: true },
-    manualFiltering: true, //turn off built-in client-side filtering
-    manualPagination: true, //turn off built-in client-side pagination
-    manualSorting: true, //turn off built-in client-side sorting
+    manualFiltering: true,
+    manualPagination: true,
+    manualSorting: true,
+
     muiToolbarAlertBannerProps: isError
-      ? {
-          color: "error",
-          children: "Error loading data",
-        }
+      ? { color: "error", children: "Error loading data" }
       : undefined,
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting,
-    rowCount: data?.meta?.totalRowCount ?? 0,
-    onRowSelectionChange: setRowSelection,
+
+    // ✅ Guarded setters (prevents infinite re-renders)
+    onColumnFiltersChange: (updater) => {
+      const next =
+        typeof updater === "function" ? updater(columnFilters) : updater;
+      if (JSON.stringify(next) !== JSON.stringify(columnFilters)) {
+        setColumnFilters(next);
+      }
+    },
+
+    onGlobalFilterChange: (val) => {
+      if (val !== globalFilter) {
+        setGlobalFilter(val);
+      }
+    },
+
+    onPaginationChange: (updater) => {
+      const next =
+        typeof updater === "function" ? updater(pagination) : updater;
+      if (
+        next.pageIndex !== pagination.pageIndex ||
+        next.pageSize !== pagination.pageSize
+      ) {
+        setPagination(next);
+      }
+    },
+
+    onSortingChange: (updater) => {
+      const next = typeof updater === "function" ? updater(sorting) : updater;
+      if (JSON.stringify(next) !== JSON.stringify(sorting)) {
+        setSorting(next);
+      }
+    },
+
+    onRowSelectionChange: (updater) => {
+      const next =
+        typeof updater === "function" ? updater(rowSelection) : updater;
+      if (JSON.stringify(next) !== JSON.stringify(rowSelection)) {
+        setRowSelection(next);
+      }
+    },
+
+    rowCount: meta?.totalRowCount ?? 0,
+
     state: {
       columnFilters,
       globalFilter,
@@ -175,16 +190,16 @@ const Datatable = ({
       sorting,
       rowSelection,
     },
-    getRowId: (originalRow) => originalRow._id,
-    //customize built-in buttons in the top-right of top toolbar
+
+    // ✅ Must be stable or selection will loop forever
+    getRowId: (row) => row._id,
+
     renderToolbarInternalActions: ({ table }) => (
       <Box>
-        {/* along-side built-in buttons in whatever order you want them */}
         <MRT_ToggleGlobalFilterButton table={table} />
         <MRT_ShowHideColumnsButton table={table} />
         <MRT_ToggleFullScreenButton table={table} />
         <MRT_ToggleDensePaddingButton table={table} />
-        {/* add custom button to print table  */}
         {deleteType !== "PD" && (
           <Tooltip title="Recycle Bin">
             <Link href={trashView}>
@@ -194,65 +209,18 @@ const Datatable = ({
             </Link>
           </Tooltip>
         )}
-        {deleteType === "SD" && (
-          <Tooltip title="Delete all">
-            <IconButton
-              disabled={
-                !table.getIsSomeRowsSelected() && !table.getIsAllRowsSelected()
-              }
-              onClick={() => {
-                deleteHandler(Object.keys.rowSelection, deleteType);
-              }}
-            >
-              <DeleteOutlineOutlined />
-            </IconButton>
-          </Tooltip>
-        )}
-        {deleteType === "PD" && (
-          <>
-            {" "}
-            (
-            <Tooltip title="Restore Data">
-              <Link href={trashView}>
-                <IconButton
-                  disabled={
-                    !table.getIsSomeRowsSelected() &&
-                    !table.getIsAllRowsSelected()
-                  }
-                  onClick={() => {
-                    deleteHandler(Object.keys.rowSelection, "RSD");
-                  }}
-                >
-                  <RestoreFromTrash />
-                </IconButton>
-              </Link>
-            </Tooltip>
-            <Tooltip title="Permanentaly Delete">
-              <Link href={trashView}>
-                <IconButton
-                  disabled={
-                    !table.getIsSomeRowsSelected() &&
-                    !table.getIsAllRowsSelected()
-                  }
-                  onClick={() => {
-                    deleteHandler(Object.keys.rowSelection, deleteType);
-                  }}
-                >
-                  <DeleteForever />
-                </IconButton>
-              </Link>
-            </Tooltip>
-            )
-          </>
-        )}
       </Box>
     ),
+
     enableRowActions: true,
-    positionActionsColumn: "last", 
+    positionActionsColumn: "last",
     renderRowActionMenuItems: ({ row }) =>
-      createAction(row, deleteType, deleteHandler),
+      typeof createAction === "function"
+        ? createAction(row, deleteType, handleDelete)
+        : [],
+
     renderTopToolbarCustomActions: ({ table }) => (
-      <Tooltip>
+      <Tooltip title="Export Data">
         <ButtonLoading
           type="button"
           text={
@@ -261,13 +229,13 @@ const Datatable = ({
             </>
           }
           loading={exportLoading}
-          onClick={() => handleExport(table.getSelectedRowModel)}
+          onClick={() => handleExport(table.getSelectedRowModel().rows)}
         />
       </Tooltip>
     ),
   });
 
-  return <MaterialReactTable table={table}/>
+  return <MaterialReactTable table={table} />;
 };
 
 export default Datatable;
