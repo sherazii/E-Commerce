@@ -26,8 +26,8 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { adminAppSidebarMenu } from "@/lib/adminSidebarMenu";
-import LogoBlack from "@/public/assets/images/logo-black.png";
-import LogoWhite from "@/public/assets/images/logo-white.png";
+import LogoBlack from "@/public/assets/images/logo-black.svg";
+import LogoWhite from "@/public/assets/images/logo-white.svg";
 
 const AppSidebar = () => {
   const { toggleSidebar } = useSidebar();
@@ -39,14 +39,14 @@ const AppSidebar = () => {
           <Image
             src={LogoBlack}
             width={50}
-            className="block dark:hidden h-[50px] w-auto"
+            className="block dark:hidden h-[60px] w-[200px]"
             alt="logo dark"
           />
 
           <Image
             src={LogoWhite}
             width={50}
-            className="hidden dark:block h-[50px] w-auto"
+            className="hidden dark:block h-[60px] w-auto"
             alt="logo white"
           />
           <Button
