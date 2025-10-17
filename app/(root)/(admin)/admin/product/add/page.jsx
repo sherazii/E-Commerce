@@ -24,6 +24,8 @@ import { useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import useFetch from "@/hooks/useFetch";
 import Select from "@/components/application/Select";
+import Editor from "@/components/application/admin/Editor";
+import MediaModal from "@/components/application/admin/MediaModal";
 
 const breadCrumbData = [
   {
@@ -52,6 +54,8 @@ const formSchema = zSchema.pick({
 
 function AddProduct() {
   const [categoryOptions, setCategoryOptions] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState(false);
   //Fetching categories
   const { data: categoryData } = useFetch(`/api/category`);
   useEffect(() => {
@@ -63,7 +67,6 @@ function AddProduct() {
       setCategoryOptions(options);
     }
   }, [categoryData]);
-
 
   // initialize form
   const form = useForm({
@@ -113,11 +116,17 @@ function AddProduct() {
     }
   }
 
+  //Editor
+  const editor = (editor) => {
+    const data = editor.getData();
+    form.setValue("description", data);
+  };
+
   return (
     <div className="">
       <BreadCrumb breadCrumbData={breadCrumbData} />
       <div className="w-full h-full flex  justify-center">
-        <Card className={`w-[75%] h-[45%] shadow-2xl mt-20`}>
+        <Card className={`w-[75%] h-[45%] shadow-2xl my-5`}>
           <CardHeader>
             <CardTitle
               className={`w-full text-3xl font-bold font-[Pacifico] text-primary`}
@@ -252,12 +261,30 @@ function AddProduct() {
                           <span className="text-red-500 ">*</span>
                         </FormLabel>
                         <FormControl>
-                          <Textarea placeholder="Type your message here." {...field} />
+                          <div className="w-[99%]">
+                            <Editor
+                              onChange={editor}
+                              initialData={field.value}
+                            />
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+                </div>
+
+                <div className="md:col-span-2 border border-dashed rounded p-5 text-center">
+                  <MediaModal
+                    open={open}
+                    setOpen={setOpen}
+                    selectedMedia={selectedMedia}
+                    setSelectedMedia={setSelectedMedia}
+                    isMultiple={true}
+                  />
+                  <div className="bg-gray-50 dark:bg-card border w-[200px] mx-auto p-5 cursor-pointer" onClick={() => setOpen(true)}>
+                    <span className="">Select Media</span>
+                  </div>
                 </div>
 
                 <Button
