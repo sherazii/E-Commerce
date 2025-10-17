@@ -26,6 +26,7 @@ import useFetch from "@/hooks/useFetch";
 import Select from "@/components/application/Select";
 import Editor from "@/components/application/admin/Editor";
 import MediaModal from "@/components/application/admin/MediaModal";
+import Image from "next/image";
 
 const breadCrumbData = [
   {
@@ -55,7 +56,7 @@ const formSchema = zSchema.pick({
 function AddProduct() {
   const [categoryOptions, setCategoryOptions] = useState([]);
   const [open, setOpen] = useState(false);
-  const [selectedMedia, setSelectedMedia] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState([]);
   //Fetching categories
   const { data: categoryData } = useFetch(`/api/category`);
   useEffect(() => {
@@ -117,11 +118,10 @@ function AddProduct() {
   }
 
   // Editor handler
-const handleEditorChange = (event, editor) => {
-  const data = editor.getData();
-  form.setValue("description", data);
-};
-
+  const handleEditorChange = (event, editor) => {
+    const data = editor.getData();
+    form.setValue("description", data);
+  };
 
   return (
     <div className="">
@@ -283,7 +283,31 @@ const handleEditorChange = (event, editor) => {
                     setSelectedMedia={setSelectedMedia}
                     isMultiple={true}
                   />
-                  <div className="bg-gray-50 dark:bg-card border w-[200px] mx-auto p-5 cursor-pointer" onClick={() => setOpen(true)}>
+                  {selectedMedia.length > 0 && (
+                    <>
+                      <div className="flex justify-center items-center flex-wrap mb-3 gap-2">
+                        {selectedMedia.map((media) => (
+                            <div className="h-24 w-24 border" key={media._id}>
+                              {
+                                <div className="size-full flex items-center justify-center">
+                                  <Image
+                                    src={media.url}
+                                    alt=""
+                                    className="size-full object-cover"
+                                    height={100}
+                                    width={100}
+                                  />
+                                </div>
+                              }
+                            </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                  <div
+                    className="bg-gray-50 dark:bg-card border w-[200px] mx-auto p-5 cursor-pointer"
+                    onClick={() => setOpen(true)}
+                  >
                     <span className="">Select Media</span>
                   </div>
                 </div>

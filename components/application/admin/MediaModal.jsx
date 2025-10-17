@@ -9,9 +9,11 @@ import {
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 import loading from "@/public/assets/images/loading.svg";
 import Media from "./Media";
+import ModalMediaBlock from "./ModalMediaBlock";
+import { showToast } from "@/lib/showToast";
 
 const MediaModal = ({
   open,
@@ -20,6 +22,8 @@ const MediaModal = ({
   setSelectedMedia,
   isMultiple,
 }) => {
+  
+  const [prevSelected, setPrevSelected ] = useState([])
   const fetchMedia = async (page) => {
     const { data: response } = await axios.get(
       `/api/media?page=${page}&&limit=18&&deleteType=SD`
@@ -49,11 +53,22 @@ const MediaModal = ({
     },
   });
 
-  const handleClear = () => {};
-  const handleClose = () => {
-    setOpen(!open);
+  const handleClear = () => {
+    setSelectedMedia([]);
+    setPrevSelected([])
+    showToast('success', 'Media Selection cleared.')
   };
-  const handleSelect = () => {};
+  const handleClose = () => {
+    setSelectedMedia(prevSelected);
+    setOpen(false)
+  };
+  const handleSelect = () => {
+    if(selectedMedia.length <= 0){
+      return showToast('error', 'Please select a media')
+    }
+    setPrevSelected(selectedMedia)
+    setOpen(false)
+  };
 
   return (
     <Dialog open={open} onOpenChange={() => setOpen(!open)}>
@@ -80,13 +95,21 @@ const MediaModal = ({
                 </div>
               </>
             ) : (
-              <><div className="grid lg:grid-cols-6 grid-cols-3 gap-2">
-                {data?.pages
+              <>
+                <div className="grid lg:grid-cols-6 grid-cols-3 gap-2">
+                  {data?.pages
                     ?.flatMap((page) => page.mediaData || [])
                     .map((media, idx) => (
-                     <span className="" key={media._id}>{media._id}</span>
+                      <ModalMediaBlock
+                        key={media._id}
+                        media={media}
+                        selectedMedia={selectedMedia}
+                        setSelectedMedia={setSelectedMedia}
+                        isMultiple={isMultiple}
+                      />
                     ))}
-                </div></>
+                </div>
+              </>
             )}
           </div>
 
