@@ -116,11 +116,12 @@ function AddProduct() {
     }
   }
 
-  //Editor
-  const editor = (editor) => {
-    const data = editor.getData();
-    form.setValue("description", data);
-  };
+  // Editor handler
+const handleEditorChange = (event, editor) => {
+  const data = editor.getData();
+  form.setValue("description", data);
+};
+
 
   return (
     <div className="">
@@ -263,7 +264,7 @@ function AddProduct() {
                         <FormControl>
                           <div className="w-[99%]">
                             <Editor
-                              onChange={editor}
+                              onChange={handleEditorChange}
                               initialData={field.value}
                             />
                           </div>
