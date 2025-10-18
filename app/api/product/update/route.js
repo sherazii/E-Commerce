@@ -4,9 +4,9 @@ import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/serverHelper";
 import { zSchema } from "@/lib/zodSchema";
-import CategoryModel from "@/models/category.model";
+import ProductModel from "@/models/product.model";
 
-// Adding Category
+// Adding Product
 export async function PUT(request) {
   try {
     // ✅ Authentication check
@@ -25,75 +25,93 @@ export async function PUT(request) {
       _id: true,
       name: true,
       slug: true,
+      mrp: true,
+      sellingPrice: true,
+      discountPercentage: true,
+      description: true,
+      media: true,
     });
 
     const validateData = schema.safeParse(payload);
     if (!validateData.success) {
-      return response(false, 404, "This category not found");
+      return response(false, 404, "This product not found");
     }
 
-    const { _id, name, slug } = validateData.data;
-    
+    const {
+      _id,
+      name,
+      slug,
+      mrp,
+      sellingPrice,
+      discountPercentage,
+      description,
+      media,
+    } = validateData.data;
 
     // ✅ Check duplicate
-    const getCategory = await CategoryModel.findOne({
+    const getProduct = await ProductModel.findOne({
       deletedAt: null,
       _id,
     });
-    if (!getCategory) {
-      return response(false, 404, "This category not found");
+    if (!getProduct) {
+      return response(false, 404, "This product not found");
     }
-    // ✅ Create category
-    getCategory.name = name;
-    getCategory.slug = slug;
-    await getCategory.save();
+    // ✅ Create product
+    getProduct.name = name;
+    getProduct.slug = slug;
+    getProduct.mrp = mrp;
+    getProduct.sellingPrice = sellingPrice;
+    getProduct.discountPercentage = discountPercentage;
+    getProduct.description = description;
+    getProduct.media = media;
+    await getProduct.save();
 
-    return response(true, 200, "Category updated successfully");
+    return response(true, 200, "Product updated successfully");
   } catch (error) {
-    console.error("[CATEGORY CREATE ERROR]:", error);
+    console.error("[PRODUCT CREATE ERROR]:", error);
     return catchError(error, error.message || "Internal Server Error");
   }
 }
 
-// // Get category details
+// // Get product details
 // export const getCategoryDetails = async (req, res, next) => {
 //    try {
 //     const { categoryid } = req.params;
 
-//     const category = await Category.findById(categoryid);
-//     if (!category) return next(handleError(404, "Category not found"));
+//     const product = await Product.findById(categoryid);
+//     if (!product) return next(handleError(404, "Product not found"));
 
 //     res.status(200).json({
-//       category,
+//       product,
 //     });
 //   } catch (error) {
-//     next(handleError(500, "Error from category controller"));
+//     next(handleError(500, "Error from product controller"));
 //   }
 // };
 // // Delete Categories
 // export const deleteCategory = async (req, res, next) => {
 //   try {
 //     const { categoryid } = req.params;
-//     const deletedCategory = await Category.findByIdAndDelete(categoryid);
+//     const deletedCategory = await Product.findByIdAndDelete(categoryid);
 
 //     if (!deletedCategory) {
-//       return next(handleError(404, "Category not found"));
+//       return next(handleError(404, "Product not found"));
 //     }
 
 //     res.status(200).json({
 //       success: true,
-//       message: "Category deleted successfully",
+//       message: "Product deleted successfully",
 //     });
 //   } catch (error) {
-//     return next(handleError(400, error.message || "Error deleting category!"));
+//     return next(handleError(400, error.message || "Error deleting product!"));
 //   }
 // };
-// // Update category logic goes here
+// // Update product logic goes here
 // export const updateCategory = async (req, res, next) => {
 //   try {
 //     const { name, slug } = req.body;
 //     const { categoryid } = req.params;
-//     const category = await Category.findByIdAndUpdate(
+//     const product = await Product.findByIdAndUpdate(
 //       categoryid,
 //       {
 //         name,
@@ -104,10 +122,10 @@ export async function PUT(request) {
 
 //     res.status(200).json({
 //       success: true,
-//       message: "Category updated",
-//       category,
+//       message: "Product updated",
+//       product,
 //     });
 //   } catch (error) {
-//     next(handleError(500, "Error from category controller"));
+//     next(handleError(500, "Error from product controller"));
 //   }
 // };
