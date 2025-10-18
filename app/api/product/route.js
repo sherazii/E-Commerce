@@ -1,7 +1,7 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/serverHelper";
-import CategoryModel from "@/models/category.model";
+import ProductModel from "@/models/product.model";
 import { NextResponse } from "next/server";
 
 // Get all categories
@@ -15,16 +15,17 @@ export async function GET(request) {
     }
     // ✅ Connect to DB
     await connectDB();
-
+    
+    
     const searchParams = await request.nextUrl.searchParams;
-
+    
     const start = parseInt(searchParams.get("start") || 0, 10);
     const size = parseInt(searchParams.get("size") || 10, 10);
     const filters = JSON.parse(searchParams.get("filters") || "[]");
     const globalFilter = searchParams.get("globalFilter") || "";
     const sorting = JSON.parse(searchParams.get("sorting") || "[]");
     const deleteType = searchParams.get("deleteType");
-
+    
     //Build matchQuery
     let matchQuery = {};
     if (deleteType === "SD") {
@@ -32,7 +33,7 @@ export async function GET(request) {
     } else if (deleteType === "PD") {
       matchQuery = { deletedAt: { $ne: null } };
     }
-
+    
     //Global search
     if (globalFilter) {
       matchQuery["$or"] = [
@@ -44,20 +45,34 @@ export async function GET(request) {
         },
       ];
     }
-
+    
     // Column filtration
     filters.forEach((filter) => {
       matchQuery[filter.id] = { $regex: filter.value, $options: "i" };
     });
-
+    
     //Sorting data
     let sortQuery = {};
     sorting.forEach((sort) => {
       sortQuery[sort.id] = sort.desc ? -1 : 1;
     });
-
+    
     //aggregation pipeline
     const aggregatePipeline = [
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category",
+          foreignField: "_id",
+          as: "categoryData",
+        },
+      },
+      {
+        $unwind: {
+          path: "$categoryData",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
       { $match: matchQuery },
       { $sort: Object.keys(sortQuery).length ? sortQuery : { createdAt: -1 } },
       { $skip: start },
@@ -67,22 +82,26 @@ export async function GET(request) {
           _id: 1,
           name: 1,
           slug: 1,
+          mrp: 1,
+          sellingPrice: 1,
+          discountPercentage: 1,
+          category: "$categoryData.name",
           createdAt: 1,
           updatedAt: 1,
           deletedAt: 1,
         },
       },
     ];
-
+    
     // Execute query
-    const getCategory = await CategoryModel.aggregate(aggregatePipeline);
+    const getProduct = await ProductModel.aggregate(aggregatePipeline);
 
     // Get total row count
-    const totalRowCount = await CategoryModel.countDocuments(matchQuery);
+    const totalRowCount = await ProductModel.countDocuments(matchQuery);
 
     return NextResponse.json({
       success: true,
-      data: getCategory,
+      data: getProduct,
       meta: { totalRowCount },
     });
   } catch (error) {
