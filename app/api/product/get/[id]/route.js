@@ -1,7 +1,7 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError,  response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/serverHelper";
-import CategoryModel from "@/models/category.model";
+import ProductModel from "@/models/product.model";
 import { isValidObjectId } from "mongoose";
 
 export async function GET(request, { params }) {
@@ -25,12 +25,12 @@ export async function GET(request, { params }) {
         }
         
         filter._id = id;
-        const getCategory = await CategoryModel.findOne(filter).lean();
+        const getProduct = await ProductModel.findOne(filter).lean();
         
-        if (!getCategory) {
+        if (!getProduct) {
             return response(false, 404, "No Category found");
         }
-    return response(true, 200, "Category found", getCategory);
+    return response(true, 200, "Category found", getProduct);
   } catch (error) {
     return catchError(error);
   }
