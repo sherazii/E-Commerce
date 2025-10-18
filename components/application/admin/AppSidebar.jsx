@@ -32,10 +32,10 @@ import LogoWhite from "@/public/assets/images/logo-white.svg";
 const AppSidebar = () => {
   const { toggleSidebar } = useSidebar();
   return (
-    <Sidebar className={""}>
+    <Sidebar>
       {/* ─── Sidebar Header ─────────────────────────────── */}
       <SidebarHeader className="border-b h-14 p-0">
-        <div className="flex justify-between items-center px-4">
+        <div className="flex justify-between items-center w-full">
           <Image
             src={LogoBlack}
             width={50}
