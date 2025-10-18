@@ -95,9 +95,37 @@ function AddProduct() {
     }
   }, [categoryName]);
 
+  //Calculate disount percentage
+  // Calculate discount percentage
+  const mrp = form.watch("mrp");
+  const sellingPrice = form.watch("sellingPrice");
+
+  useEffect(() => {
+    const mrpValue = parseFloat(form.getValues("mrp")) || 0;
+    const sellingPriceValue = parseFloat(form.getValues("sellingPrice")) || 0;
+
+    const discount = mrpValue - sellingPriceValue;
+    const discountPercentage = (discount / mrpValue) * 100;
+
+    // If discountPercentage is NaN or infinite, set 0 instead
+    const validDiscount =
+      isNaN(discountPercentage) || !isFinite(discountPercentage)
+        ? 0
+        : parseFloat(discountPercentage).toFixed(2);
+
+    form.setValue("discountPercentage", validDiscount);
+  }, [mrp, sellingPrice]);
+
   // 2. Define a submit handler.
   async function onSubmit(data) {
+    
     try {
+      if (selectedMedia.length <= 0) {
+        return showToast("error", "Please select media");
+      }
+      const mediaIds = selectedMedia.map((media) => media._id);
+      data.media = mediaIds;
+
       const { data: response } = await axios.post("/api/product/create", data);
 
       // Axios auto-parses response JSON → available in response.data
@@ -168,6 +196,7 @@ function AddProduct() {
                         <Input
                           placeholder="Enter Product slug"
                           type={"text"}
+                          readOnly
                           {...field}
                         />
                       </FormControl>
@@ -244,6 +273,7 @@ function AddProduct() {
                         <Input
                           placeholder="Enter discount %"
                           type="number"
+                          readOnly
                           {...field}
                         />
                       </FormControl>
@@ -287,19 +317,19 @@ function AddProduct() {
                     <>
                       <div className="flex justify-center items-center flex-wrap mb-3 gap-2">
                         {selectedMedia.map((media) => (
-                            <div className="h-24 w-24 border" key={media._id}>
-                              {
-                                <div className="size-full flex items-center justify-center">
-                                  <Image
-                                    src={media.url}
-                                    alt=""
-                                    className="size-full object-cover"
-                                    height={100}
-                                    width={100}
-                                  />
-                                </div>
-                              }
-                            </div>
+                          <div className="h-24 w-24 border" key={media._id}>
+                            {
+                              <div className="size-full flex items-center justify-center">
+                                <Image
+                                  src={media.url}
+                                  alt=""
+                                  className="size-full object-cover"
+                                  height={100}
+                                  width={100}
+                                />
+                              </div>
+                            }
+                          </div>
                         ))}
                       </div>
                     </>

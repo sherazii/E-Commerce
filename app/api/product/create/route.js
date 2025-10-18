@@ -1,103 +1,61 @@
-// All imports
-
+// ✅ All imports
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/serverHelper";
-import CategoryModel from "@/models/category.model";
+import { zSchema } from "@/lib/zodSchema";
+import ProductModel from "@/models/product.model";
 
-// Adding Category
+// ✅ Create Product API
 export async function POST(request) {
   try {
     // ✅ Authentication check
     const auth = await isAuthenticated("admin");
-
     if (!auth.isAuthenticated) {
-      return response(false, 403, "Unauthorised");
+      return response(false, 403, "Unauthorized");
     }
 
     // ✅ Connect to DB
     await connectDB();
 
-    // ✅ Parse body
-    const { name, slug } = await request.json();
+    // ✅ Parse request body
+    const payload = await request.json();
 
-    if (!name?.trim()) {
-      return response(false, 400, "Category name is required");
+    // ✅ Validate with Zod schema
+    const schema = zSchema.pick({
+      name: true,
+      slug: true,
+      category: true,
+      mrp: true,
+      sellingPrice: true,
+      discountPercentage: true,
+      description: true,
+      media: true,
+    });
+
+    const validate = schema.safeParse(payload);
+
+    if (!validate.success) {
+      return response(false, 400, "Invalid or missing fields", validate.error);
     }
-    if (!slug?.trim()) {
-      return response(false, 400, "Slug is required");
-    }
 
-    // ✅ Check duplicate
-    const existingSlug = await CategoryModel.findOne({ slug }).lean();
-    if (existingSlug) {
-      return response(false, 400, "This category already exists");
-    }
+    const productData = validate.data;
 
-    // ✅ Create category
-    await CategoryModel.create({ name, slug });
+    // ✅ Create Product (fixed create syntax)
+    const newProduct = await ProductModel.create({
+      name: productData.name,
+      slug: productData.slug,
+      category: productData.category,
+      mrp: productData.mrp,
+      sellingPrice: productData.sellingPrice,
+      discountPercentage: productData.discountPercentage,
+      description: productData.description,
+      media: productData.media,
+    });
 
-    return response(true, 200, "Category created successfully");
+    // ✅ (No need to call save() after .create(), it already saves the doc)
+    return response(true, 200, "Product created successfully", newProduct);
   } catch (error) {
-    console.error("[CATEGORY CREATE ERROR]:", error);
+    console.error("[PRODUCT CREATE ERROR]:", error);
     return catchError(error, error.message || "Internal Server Error");
   }
 }
-
-
-// // Get category details
-// export const getCategoryDetails = async (req, res, next) => {
-//    try {
-//     const { categoryid } = req.params;
-
-//     const category = await Category.findById(categoryid);
-//     if (!category) return next(handleError(404, "Category not found"));
-
-//     res.status(200).json({
-//       category,
-//     });
-//   } catch (error) {
-//     next(handleError(500, "Error from category controller"));
-//   }
-// };
-// // Delete Categories
-// export const deleteCategory = async (req, res, next) => {
-//   try {
-//     const { categoryid } = req.params;
-//     const deletedCategory = await Category.findByIdAndDelete(categoryid);
-
-//     if (!deletedCategory) {
-//       return next(handleError(404, "Category not found"));
-//     }
-
-//     res.status(200).json({
-//       success: true,
-//       message: "Category deleted successfully",
-//     });
-//   } catch (error) {
-//     return next(handleError(400, error.message || "Error deleting category!"));
-//   }
-// };
-// // Update category logic goes here
-// export const updateCategory = async (req, res, next) => {
-//   try {
-//     const { name, slug } = req.body;
-//     const { categoryid } = req.params;
-//     const category = await Category.findByIdAndUpdate(
-//       categoryid,
-//       {
-//         name,
-//         slug,
-//       },
-//       { new: true }
-//     );
-
-//     res.status(200).json({
-//       success: true,
-//       message: "Category updated",
-//       category,
-//     });
-//   } catch (error) {
-//     next(handleError(500, "Error from category controller"));
-//   }
-// };
