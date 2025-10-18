@@ -60,7 +60,7 @@ function EditProduct() {
   const [selectedMedia, setSelectedMedia] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const { data: categoryData } = useFetch(`/api/category?deleteType=SD&&size=10000`);
+  const { data: categoryData } = useFetch(`/api/category`);
   const { data: productData } = useFetch(`/api/product/get/${id}`);
 
   // ✅ Initialize form

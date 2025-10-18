@@ -17,11 +17,10 @@ import { Input } from "@/components/ui/input";
 import { showToast } from "@/lib/showToast";
 import slugify from "slugify";
 import BreadCrumb from "@/components/application/admin/BreadCrumb";
-import { ADMIN_PRODUCT_SHOW, ADMIN_DASHBOARD } from "@/routes/AdminPanelRoute";
+import {  ADMIN_DASHBOARD, ADMIN_PRODUCT_VARIANT_SHOW } from "@/routes/AdminPanelRoute";
 import { zSchema } from "@/lib/zodSchema";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Textarea } from "@/components/ui/textarea";
 import useFetch from "@/hooks/useFetch";
 import Select from "@/components/application/Select";
 import Editor from "@/components/application/admin/Editor";
@@ -34,12 +33,12 @@ const breadCrumbData = [
     label: "Home",
   },
   {
-    href: ADMIN_PRODUCT_SHOW,
-    label: "Product",
+    href: ADMIN_PRODUCT_VARIANT_SHOW,
+    label: "Product Variants",
   },
   {
     href: "",
-    label: "Add Product",
+    label: "Add Product variant",
   },
 ];
 
@@ -54,20 +53,20 @@ const formSchema = zSchema.pick({
 });
 
 function AddProduct() {
-  const [categoryOptions, setCategoryOptions] = useState([]);
+  const [productOption, setProductOption] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState([]);
   //Fetching categories
-  const { data: categoryData } = useFetch(`/api/category?deleteType=SD&&size=10000`);
+  const { data: productData } = useFetch(`/api/category?deleteType=SD&&size=10000`);
   useEffect(() => {
-    if (categoryData && categoryData.success) {
-      const options = categoryData?.data?.map((cat) => ({
-        label: cat.name,
-        value: cat._id,
+    if (productData && productData.success) {
+      const options = productData?.data?.map((product) => ({
+        label: product.name,
+        value: product._id,
       }));
-      setCategoryOptions(options);
+      setProductOption(options);
     }
-  }, [categoryData]);
+  }, [productData]);
 
   // initialize form
   const form = useForm({
@@ -83,19 +82,6 @@ function AddProduct() {
     },
   });
 
-  //   use slugify pkj
-  const categoryName = form.watch("name");
-  useEffect(() => {
-    if (categoryName) {
-      const slug = slugify(categoryName, {
-        lower: true,
-        strict: true,
-      });
-      form.setValue("slug", slug);
-    }
-  }, [categoryName]);
-
-  //Calculate disount percentage
   // Calculate discount percentage
   const mrp = form.watch("mrp");
   const sellingPrice = form.watch("sellingPrice");
