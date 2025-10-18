@@ -1,29 +1,19 @@
 "use client";
+
 import BreadCrumb from "@/components/application/admin/BreadCrumb";
 import DatatableWrapper from "@/components/application/admin/DatatableWrapper";
 import DeleteAction from "@/components/application/admin/DeleteAction";
-import EditAction from "@/components/application/admin/EditAction";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { DT_CATEGORY_COLUMN } from "@/lib/column";
+import { DT_CATEGORY_COLUMN, DT_PRODUCT_COLUMN } from "@/lib/column";
 import { columnConfig } from "@/lib/helperFunction";
 import { showToast } from "@/lib/showToast";
 import { ADMIN_DASHBOARD, ADMIN_TRASH } from "@/routes/AdminPanelRoute";
-import axios from "axios";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { FiPlus } from "react-icons/fi";
+import { useCallback, useEffect, useMemo } from "react";
 
 const breadCrumbData = [
-  {
-    href: ADMIN_DASHBOARD,
-    label: "Home",
-  },
-  {
-    href: ADMIN_TRASH,
-    label: "Trash",
-  },
+  { href: ADMIN_DASHBOARD, label: "Home" },
+  { href: ADMIN_TRASH, label: "Trash" },
 ];
 
 const TRASH_CONFIG = {
@@ -34,15 +24,29 @@ const TRASH_CONFIG = {
     exportUrl: "/api/category/export",
     deleteUrl: "/api/category/delete",
   },
+  product: {
+    title: "Product Trash",
+    columns: DT_PRODUCT_COLUMN,
+    fetchUrl: "/api/product",
+    exportUrl: "/api/product/export",
+    deleteUrl: "/api/product/delete",
+  },
 };
+
 function Trash() {
   const searchParams = useSearchParams();
   const trashof = searchParams.get("trashof");
   const config = TRASH_CONFIG[trashof];
 
+  // ✅ Show toast only once
+  useEffect(() => {
+    if (!config) {
+      showToast("error", "Invalid or missing trash type.");
+    }
+  }, [config]);
+
   if (!config) {
-    showToast("error", "Invalid or missing trash type.");
-    return;
+    return <div className="p-4 text-red-500">Invalid or missing trash type.</div>;
   }
 
   const columns = useMemo(() => {
@@ -61,10 +65,10 @@ function Trash() {
   }, []);
 
   return (
-    <div className="">
+    <div>
       <BreadCrumb breadCrumbData={breadCrumbData} />
       <Card className="py-0 rounded shadow-sm">
-        <CardHeader className="pt-3 px-3 border-b [.border-b]:pb-2">
+        <CardHeader className="pt-3 px-3 border-b pb-2">
           <div className="flex items-center justify-between">
             <h4 className="text-xl font-semibold">{config.title}</h4>
           </div>

@@ -1,7 +1,7 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/serverHelper";
-import CategoryModel from "@/models/category.model";
+import ProductModel from "@/models/product.model";
 
 /**
  * PUT → Soft Delete (SD) or Restore (RSD)
@@ -26,8 +26,8 @@ export async function PUT(request) {
     }
 
     // ✅ Check if records exist
-    const categories = await CategoryModel.find({ _id: { $in: ids } });
-    if (!categories.length) {
+    const products = await ProductModel.find({ _id: { $in: ids } });
+    if (!products.length) {
       return response(false, 400, "Data not found");
     }
 
@@ -43,7 +43,7 @@ export async function PUT(request) {
     // ✅ Soft Delete or Restore using updateMany
     const updateValue =
       deleteType === "SD" ? { deletedAt: new Date() } : { deletedAt: null };
-    await CategoryModel.updateMany(
+    await ProductModel.updateMany(
       { _id: { $in: ids } },
       { $set: updateValue }
     );
@@ -88,13 +88,13 @@ export async function DELETE(request) {
     }
 
     // ✅ Confirm data exists
-    const categories = await CategoryModel.find({ _id: { $in: ids } }).lean();
-    if (!categories.length) {
+    const products = await ProductModel.find({ _id: { $in: ids } }).lean();
+    if (!products.length) {
       return response(false, 400, "Data not found");
     }
 
     // ✅ Delete from database
-    await CategoryModel.deleteMany({ _id: { $in: ids } });
+    await ProductModel.deleteMany({ _id: { $in: ids } });
 
     return response(true, 200, "Data permanently deleted");
   } catch (error) {
