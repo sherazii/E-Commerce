@@ -112,7 +112,7 @@ function AddProduct() {
       const mediaIds = selectedMedia.map((media) => media._id);
       data.media = mediaIds;
 
-      const { data: response } = await axios.post("/api/product/create", data);
+      const { data: response } = await axios.post("/api/product-variant/create", data);
 
       // Axios auto-parses response JSON → available in response.data
       if (!response.success) {
@@ -131,11 +131,6 @@ function AddProduct() {
     }
   }
 
-  // Editor handler
-  const handleEditorChange = (event, editor) => {
-    const data = editor.getData();
-    form.setValue("description", data);
-  };
 
   return (
     <div className="">
@@ -146,7 +141,7 @@ function AddProduct() {
             <CardTitle
               className={`w-full text-3xl font-bold font-[Pacifico] text-primary`}
             >
-              Add Product{" "}
+              Add Product Variant{" "}
             </CardTitle>
           </CardHeader>
           <CardContent>
