@@ -17,7 +17,10 @@ import { Input } from "@/components/ui/input";
 import { showToast } from "@/lib/showToast";
 import slugify from "slugify";
 import BreadCrumb from "@/components/application/admin/BreadCrumb";
-import {  ADMIN_DASHBOARD, ADMIN_PRODUCT_VARIANT_SHOW } from "@/routes/AdminPanelRoute";
+import {
+  ADMIN_DASHBOARD,
+  ADMIN_PRODUCT_VARIANT_SHOW,
+} from "@/routes/AdminPanelRoute";
 import { zSchema } from "@/lib/zodSchema";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -26,6 +29,7 @@ import Select from "@/components/application/Select";
 import Editor from "@/components/application/admin/Editor";
 import MediaModal from "@/components/application/admin/MediaModal";
 import Image from "next/image";
+import { sizes } from "@/lib/utils";
 
 const breadCrumbData = [
   {
@@ -43,13 +47,13 @@ const breadCrumbData = [
 ];
 
 const formSchema = zSchema.pick({
-  name: true,
-  slug: true,
-  category: true,
+  product: true,
+  sku: true,
+  color: true,
+  size: true,
   mrp: true,
   sellingPrice: true,
   discountPercentage: true,
-  description: true,
 });
 
 function AddProduct() {
@@ -57,7 +61,9 @@ function AddProduct() {
   const [open, setOpen] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState([]);
   //Fetching categories
-  const { data: productData } = useFetch(`/api/category?deleteType=SD&&size=10000`);
+  const { data: productData } = useFetch(
+    `/api/product?deleteType=SD&&size=10000`
+  );
   useEffect(() => {
     if (productData && productData.success) {
       const options = productData?.data?.map((product) => ({
@@ -72,13 +78,13 @@ function AddProduct() {
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      slug: "",
-      category: "",
+      product: "",
+      sku: "",
+      color: "",
+      size: "",
       mrp: "",
       sellingPrice: "",
       discountPercentage: "",
-      description: "",
     },
   });
 
@@ -104,7 +110,6 @@ function AddProduct() {
 
   // 2. Define a submit handler.
   async function onSubmit(data) {
-    
     try {
       if (selectedMedia.length <= 0) {
         return showToast("error", "Please select media");
@@ -112,7 +117,10 @@ function AddProduct() {
       const mediaIds = selectedMedia.map((media) => media._id);
       data.media = mediaIds;
 
-      const { data: response } = await axios.post("/api/product-variant/create", data);
+      const { data: response } = await axios.post(
+        "/api/product-variant/create",
+        data
+      );
 
       // Axios auto-parses response JSON → available in response.data
       if (!response.success) {
@@ -130,7 +138,6 @@ function AddProduct() {
       showToast("error", errorMessage);
     }
   }
-
 
   return (
     <div className="">
@@ -152,50 +159,15 @@ function AddProduct() {
               >
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="product"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>
-                        Product <span className="text-red-500 ">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter Product name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="slug"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Product Slug <span className="text-red-500 ">*</span>
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Enter Product slug"
-                          type={"text"}
-                          readOnly
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Select Category <span className="text-red-500 ">*</span>
+                        Select Product <span className="text-red-500 ">*</span>
                       </FormLabel>
                       <FormControl>
                         <Select
-                          options={categoryOptions}
+                          options={productOption}
                           selected={field.value}
                           setSelected={field.onChange}
                           isMulti={false}
@@ -205,6 +177,61 @@ function AddProduct() {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="sku"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        SKU <span className="text-red-500 ">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter sku" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="color"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Variant Color <span className="text-red-500 ">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter Variant color"
+                          type={"text"}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="size"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Size <span className="text-red-500 ">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Select
+                          options={sizes}
+                          selected={field.value}
+                          setSelected={field.onChange}
+                          isMulti={false}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="mrp"
@@ -262,29 +289,6 @@ function AddProduct() {
                     </FormItem>
                   )}
                 />
-                <div className="md:col-span-2">
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>
-                          Product Description
-                          <span className="text-red-500 ">*</span>
-                        </FormLabel>
-                        <FormControl>
-                          <div className="w-[99%]">
-                            <Editor
-                              onChange={handleEditorChange}
-                              initialData={field.value}
-                            />
-                          </div>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
 
                 <div className="md:col-span-2 border border-dashed rounded p-5 text-center">
                   <MediaModal
@@ -327,7 +331,7 @@ function AddProduct() {
                   type="submit"
                   className={`md:col-span-2 w-50 rounded-full mt-4 block cursor-pointer`}
                 >
-                  Add Product
+                  Add Product Variant
                 </Button>
               </form>
             </Form>

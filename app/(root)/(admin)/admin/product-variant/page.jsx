@@ -5,7 +5,7 @@ import DeleteAction from "@/components/application/admin/DeleteAction";
 import EditAction from "@/components/application/admin/EditAction";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {  DT_PRODUCT_COLUMN } from "@/lib/column";
+import {  DT_PRODUCT_COLUMN, DT_PRODUCT_VARIANT_COLUMN } from "@/lib/column";
 import { columnConfig } from "@/lib/helperFunction";
 import { showToast } from "@/lib/showToast";
 import {
@@ -13,6 +13,9 @@ import {
   ADMIN_PRODUCT_ADD,
   ADMIN_PRODUCT_EDIT,
   ADMIN_PRODUCT_SHOW,
+  ADMIN_PRODUCT_VARIANT_ADD,
+  ADMIN_PRODUCT_VARIANT_EDIT,
+  ADMIN_PRODUCT_VARIANT_SHOW,
   ADMIN_TRASH,
 } from "@/routes/AdminPanelRoute";
 import axios from "axios";
@@ -26,24 +29,24 @@ const breadCrumbData = [
     label: "Home",
   },
   {
-    href: ADMIN_PRODUCT_SHOW,
-    label: "Product",
+    href: ADMIN_PRODUCT_VARIANT_SHOW,
+    label: "Product variant",
   },
   {
-    href: ADMIN_PRODUCT_ADD,
-    label: "Add Product",
+    href: ADMIN_PRODUCT_VARIANT_ADD,
+    label: "Add Product variant",
   },
 ];
 
 function ShowProduct() {
   const columns = useMemo(() => {
-    return columnConfig(DT_PRODUCT_COLUMN);
+    return columnConfig(DT_PRODUCT_VARIANT_COLUMN);
   }, []);
 
   const action = useCallback((row, deleteType, handleDelete) => {
     let actionMenu = [];
     actionMenu.push(
-      <EditAction href={ADMIN_PRODUCT_EDIT(row.original._id)} key="edit" />
+      <EditAction href={ADMIN_PRODUCT_VARIANT_EDIT(row.original._id)} key="edit" />
     );
     actionMenu.push(
       <DeleteAction
@@ -62,21 +65,21 @@ function ShowProduct() {
       <Card className="py-0 rounded shadow-sm">
         <CardHeader className="pt-3 px-3 border-b [.border-b]:pb-2">
           <div className="flex items-center justify-between">
-            <h4 className="text-xl font-semibold">Products Details</h4>
+            <h4 className="text-xl font-semibold">Product Variant Details</h4>
             <Button>
               <FiPlus />
-              <Link href={ADMIN_PRODUCT_ADD}>New Product</Link>
+              <Link href={ADMIN_PRODUCT_VARIANT_ADD}>New Product Variant</Link>
             </Button>
           </div>
         </CardHeader>
         <CardContent className="pb-5">
           <DatatableWrapper
             queryKey="product-data"
-            fetchUrl="/api/product"
+            fetchUrl="/api/product-variant"
             columnConfig={columns}
             initialPageSize={10}
-            exportEndpoint="/api/product/export"
-            deleteEndpoint="/api/product/delete"
+            exportEndpoint="/api/product-variant/export"
+            deleteEndpoint="/api/product-variant/delete"
             deleteType="SD"
             trashView={`${ADMIN_TRASH}?trashof=product`}
             createAction={action}

@@ -3,8 +3,7 @@ import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/serverHelper";
 import { zSchema } from "@/lib/zodSchema";
-import ProductModel from "@/models/product.model";
-import { encode } from "entities";
+import ProductVariantModel from "@/models/ProductVariant.model";
 
 // ✅ Create Product API
 export async function POST(request) {
@@ -23,13 +22,13 @@ export async function POST(request) {
 
     // ✅ Validate with Zod schema
     const schema = zSchema.pick({
-      name: true,
-      slug: true,
-      category: true,
+      product: true,
+      sku: true,
+      color: true,
+      size: true,
       mrp: true,
       sellingPrice: true,
       discountPercentage: true,
-      description: true,
       media: true,
     });
 
@@ -39,22 +38,23 @@ export async function POST(request) {
       return response(false, 400, "Invalid or missing fields", validate.error);
     }
 
-    const productData = validate.data;
+    const variantData = validate.data;
+    
 
     // ✅ Create Product (fixed create syntax)
-    const newProduct = await ProductModel.create({
-      name: productData.name,
-      slug: productData.slug,
-      category: productData.category,
-      mrp: productData.mrp,
-      sellingPrice: productData.sellingPrice,
-      discountPercentage: productData.discountPercentage,
-      description: encode(productData.description),
-      media: productData.media,
+    const newVariant = await ProductVariantModel.create({
+      product: variantData.product,
+      sku: variantData.sku,
+      color: variantData.color,
+      size: variantData.size,
+      mrp: variantData.mrp,
+      sellingPrice: variantData.sellingPrice,
+      discountPercentage: variantData.discountPercentage,
+      media: variantData.media,
     });
 
     // ✅ (No need to call save() after .create(), it already saves the doc)
-    return response(true, 200, "Product created successfully", newProduct);
+    return response(true, 200, "Product created successfully", newVariant);
   } catch (error) {
     console.error("[PRODUCT CREATE ERROR]:", error);
     return catchError(error, error.message || "Internal Server Error");

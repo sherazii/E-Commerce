@@ -27,7 +27,7 @@ function Select({
    isMulti = false, // Added prop to determine if multi-select is enabled
 }) {
    const [open, setOpen] = useState(false);
-
+   
    const handleSelect = (option) => {
        if (isMulti) {
            // If multi-select, toggle the option

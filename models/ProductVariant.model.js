@@ -2,51 +2,44 @@ import mongoose from "mongoose";
 
 const productVariantSchema = new mongoose.Schema(
   {
+    // 🔗 Reference to parent product
     product: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
       required: true,
     },
-    color: { type: String, required: true, trim: true },
-    size: { type: String, required: true, trim: true },
-    name: { type: String, required: true, trim: true },
-    slug: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
-    },
 
-    category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Category",
-      required: true,
-    },
+    // 🟩 Variant attributes
+    color: { type: String, trim: true },
+    size: { type: String, trim: true },
+    sku: { type: String, required: true, unique: true, trim: true }, // unique stock keeping unit
 
-    mrp: { type: Number, required: true }, // Maximum Retail Price
+    // 💰 Pricing (can override main product's)
+    mrp: { type: Number, required: true },
     sellingPrice: { type: Number, required: true },
     discountPercentage: { type: Number, default: 0 },
-    sku: { type: Number, required: true },
 
-    // Array of media files (e.g., image or video IDs)
+    // 🖼️ Variant-specific media
     media: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Media",
-        required: true,
+        required: false, // allow fallback to product's media
       },
     ],
 
-    description: { type: String, required: true }, // ✅ fixed "require" → "required"
+    // 📦 Inventory
+    stock: { type: Number, default: 0 },
 
-    deletedAt: { type: Date, default: null, index: true }, // Soft delete support
+    // 🗑️ Soft delete
+    deletedAt: { type: Date, default: null, index: true },
   },
-  { timestamps: true } // Adds createdAt and updatedAt
+  { timestamps: true }
 );
 
+
 const ProductVariantModel =
-  mongoose.models.ProductVAriant ||
-  mongoose.model("ProductVAriant", productVariantSchema, "productvariants");
+  mongoose.models.ProductVariant ||
+  mongoose.model("ProductVariant", productVariantSchema, "productvariants");
 
 export default ProductVariantModel;
