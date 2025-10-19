@@ -1,36 +1,37 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/serverHelper";
-import ProductModel from "@/models/product.model";
+import ProductVariantModel from "@/models/ProductVariant.model";
 
 /**
  * PUT → Soft Delete (SD) or Restore (RSD)
  */
 export async function PUT(request) {
+  
   try {
     // ✅ Authentication
     const auth = await isAuthenticated("admin");
     if (!auth.isAuthenticated) {
       return response(false, 403, "Unauthorized");
     }
-
+    
     // ✅ DB Connection
     await connectDB();
-
+    
     // ✅ Extract payload
     const { ids = [], deleteType } = await request.json();
-
+    
     // ✅ Validate IDs
     if (!Array.isArray(ids) || ids.length === 0) {
       return response(false, 400, "Invalid or Empty ID list");
     }
+    
 
     // ✅ Check if records exist
-    const products = await ProductModel.find({ _id: { $in: ids } });
+    const products = await ProductVariantModel.find({ _id: { $in: ids } });
     if (!products.length) {
       return response(false, 400, "Data not found");
     }
-
     // ✅ Validate deleteType
     if (!["SD", "RSD"].includes(deleteType)) {
       return response(
@@ -40,10 +41,12 @@ export async function PUT(request) {
       );
     }
 
+    
+
     // ✅ Soft Delete or Restore using updateMany
     const updateValue =
       deleteType === "SD" ? { deletedAt: new Date() } : { deletedAt: null };
-    await ProductModel.updateMany(
+    await ProductVariantModel.updateMany(
       { _id: { $in: ids } },
       { $set: updateValue }
     );
@@ -88,13 +91,13 @@ export async function DELETE(request) {
     }
 
     // ✅ Confirm data exists
-    const products = await ProductModel.find({ _id: { $in: ids } }).lean();
+    const products = await ProductVariantModel.find({ _id: { $in: ids } }).lean();
     if (!products.length) {
       return response(false, 400, "Data not found");
     }
 
     // ✅ Delete from database
-    await ProductModel.deleteMany({ _id: { $in: ids } });
+    await ProductVariantModel.deleteMany({ _id: { $in: ids } });
 
     return response(true, 200, "Data permanently deleted");
   } catch (error) {

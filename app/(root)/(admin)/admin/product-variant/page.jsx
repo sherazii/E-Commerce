@@ -5,22 +5,17 @@ import DeleteAction from "@/components/application/admin/DeleteAction";
 import EditAction from "@/components/application/admin/EditAction";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {  DT_PRODUCT_COLUMN, DT_PRODUCT_VARIANT_COLUMN } from "@/lib/column";
+import { DT_PRODUCT_VARIANT_COLUMN } from "@/lib/column";
 import { columnConfig } from "@/lib/helperFunction";
-import { showToast } from "@/lib/showToast";
 import {
   ADMIN_DASHBOARD,
-  ADMIN_PRODUCT_ADD,
-  ADMIN_PRODUCT_EDIT,
-  ADMIN_PRODUCT_SHOW,
   ADMIN_PRODUCT_VARIANT_ADD,
   ADMIN_PRODUCT_VARIANT_EDIT,
   ADMIN_PRODUCT_VARIANT_SHOW,
   ADMIN_TRASH,
 } from "@/routes/AdminPanelRoute";
-import axios from "axios";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { FiPlus } from "react-icons/fi";
 
 const breadCrumbData = [
@@ -46,7 +41,10 @@ function ShowProductVariant() {
   const action = useCallback((row, deleteType, handleDelete) => {
     let actionMenu = [];
     actionMenu.push(
-      <EditAction href={ADMIN_PRODUCT_VARIANT_EDIT(row.original._id)} key="edit" />
+      <EditAction
+        href={ADMIN_PRODUCT_VARIANT_EDIT(row.original._id)}
+        key="edit"
+      />
     );
     actionMenu.push(
       <DeleteAction
@@ -54,7 +52,7 @@ function ShowProductVariant() {
         handleDelete={handleDelete}
         row={row}
         deleteType={deleteType}
-      />  
+      />
     );
     return actionMenu;
   }, []);
@@ -81,7 +79,7 @@ function ShowProductVariant() {
             exportEndpoint="/api/product-variant/export"
             deleteEndpoint="/api/product-variant/delete"
             deleteType="SD"
-            trashView={`${ADMIN_TRASH}?trashof=product-variant`}
+            trashView={`${ADMIN_TRASH}?trashof=productVariant`}
             createAction={action}
           />
         </CardContent>
