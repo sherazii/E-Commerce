@@ -1,7 +1,7 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/serverHelper";
-import ProductModel from "@/models/product.model";
+import ProductVariantModel from "@/models/ProductVariant.model";
 
 export async function GET(request) {
   try {
@@ -15,14 +15,14 @@ export async function GET(request) {
     const filter = {
       deletedAt: null,
     };
-    const getProduct = await ProductModel.find(filter).select('-media -description')
+    const getProductVariant = await ProductVariantModel.find(filter).select('-media -description')
       .sort({ createdAt: -1 })
       .lean();
-    if (!getProduct) {
-      return response(false, 404, "Category data not found");
+    if (!getProductVariant) {
+      return response(false, 404, "Product variant data not found");
     }
 
-    return response(true, 200, "Category found", getProduct);
+    return response(true, 200, "Product variant found", getProductVariant);
   } catch (error) {
     return catchError(error);
   }
