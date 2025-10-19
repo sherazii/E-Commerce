@@ -17,7 +17,11 @@ import { Input } from "@/components/ui/input";
 import { showToast } from "@/lib/showToast";
 import slugify from "slugify";
 import BreadCrumb from "@/components/application/admin/BreadCrumb";
-import { ADMIN_DASHBOARD, ADMIN_PRODUCT_SHOW } from "@/routes/AdminPanelRoute";
+import {
+  ADMIN_DASHBOARD,
+  ADMIN_PRODUCT_SHOW,
+  ADMIN_PRODUCT_VARIANT_SHOW,
+} from "@/routes/AdminPanelRoute";
 import { zSchema } from "@/lib/zodSchema";
 import axios from "axios";
 import { useEffect, useState } from "react";
@@ -27,99 +31,85 @@ import Select from "@/components/application/Select";
 import Editor from "@/components/application/admin/Editor";
 import Image from "next/image";
 import { useParams } from "next/navigation";
+import { sizes } from "@/lib/utils";
+import ButtonLoading from "@/components/application/ButtonLoading";
 
 const breadCrumbData = [
   { href: ADMIN_DASHBOARD, label: "Home" },
-  { href: ADMIN_PRODUCT_SHOW, label: "Product" },
-  { href: "", label: "Edit Product" },
+  { href: ADMIN_PRODUCT_VARIANT_SHOW, label: "Product variant" },
+  { href: "", label: "Edit Product variant" },
 ];
 
-const formSchema = z.object({
-  _id: z.string().optional(),
-  name: z.string().min(3, "Product name is required"),
-  slug: z.string().min(2, "Slug is required"),
-  mrp: z.coerce.number().positive("MRP must be positive"),
-  sellingPrice: z.coerce.number().positive("Selling price must be positive"),
-  discountPercentage: z.coerce.number().min(0).max(100),
-  description: z.string().min(3, "Description is required"),
-  category: z.string().optional(),
-  media: z.array(
-    z.object({
-      _id: z.string(),
-      url: z.string().optional(),
-    })
-  ),
+const formSchema = zSchema.pick({
+  _id: true,
+  product: true,
+  sku: true,
+  color: true,
+  size: true,
+  mrp: true,
+  sellingPrice: true,
+  discountPercentage: true,
 });
 
-
-function EditProduct() {
+function EditProductVariant() {
   const { id } = useParams(); // ✅ Correct way to get dynamic param
-  
-  const [categoryOptions, setCategoryOptions] = useState([]);
+
+  const [productOptions, setProductOptions] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const { data: categoryData } = useFetch(`/api/category`);
-  const { data: productData } = useFetch(`/api/product/get/${id}`);
+  const { data: productData } = useFetch(`/api/product`);
+  const { data: productVariantData } = useFetch(
+    `/api/product-variant/get/${id}`
+  );
 
   // ✅ Initialize form
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      slug: "",
+      _id: "",
+      product: "",
+      sku: "",
+      color: "",
+      size: "",
       mrp: "",
       sellingPrice: "",
       discountPercentage: "",
-      description: "",
       media: [],
-      category: "",
     },
   });
 
   // ✅ Populate category dropdown
   useEffect(() => {
-    if (categoryData?.success) {
-      const options = categoryData.data.map((cat) => ({
-        label: cat.name,
-        value: cat._id,
+    if (productData?.success) {
+      const options = productData.data.map((product) => ({
+        label: product.name,
+        value: product._id,
       }));
-      setCategoryOptions(options);
+      setProductOptions(options);
     }
-  }, [categoryData]);
+  }, [productData]);
 
   // ✅ Pre-fill form when product data loads
   useEffect(() => {
-    if (productData?.success) {
-      const data = productData.data;
+    if (productVariantData?.success) {
+      const data = productVariantData.data;
 
       form.reset({
-        name: data.name || "",
-        slug: data.slug || "",
-        mrp: data.mrp || "",
-        sellingPrice: data.sellingPrice || "",
-        discountPercentage: data.discountPercentage || "",
-        description: data.description || "",
-        category: data.category?._id || "",
-        media: data.media || [],
-        _id: id,
+        _id: data?._id,
+        product: data?.product,
+        sku: data?.sku,
+        color: data?.color,
+        size: data?.size,
+        mrp: data?.mrp,
+        sellingPrice: data?.sellingPrice,
+        discountPercentage: data?.discountPercentage,
       });
 
       setSelectedMedia(data.media || []);
     }
-  }, [productData]);
-
-  // ✅ Auto-generate slug
-  const productName = form.watch("name");
-  useEffect(() => {
-    if (productName) {
-      form.setValue(
-        "slug",
-        slugify(productName, { lower: true, strict: true })
-      );
-    }
-  }, [productName]);
+  }, [productVariantData]);
 
   // ✅ Auto-calculate discount
   const mrp = form.watch("mrp");
@@ -134,8 +124,7 @@ function EditProduct() {
   }, [mrp, sellingPrice]);
 
   // ✅ Update product handler
-  const productUpdateHandler = async (data) => {
-    console.log("trigger"); // should now appear in console
+  const productVariantUpdateHandler = async (data) => {
     setLoading(true);
 
     try {
@@ -144,12 +133,18 @@ function EditProduct() {
         media: selectedMedia.map((m) => m._id || m),
       };
 
-      const { data: response } = await axios.put(`/api/product/update`, payload);
+      const { data: response } = await axios.put(
+        `/api/product-variant/update`,
+        payload
+      );
 
       if (!response.success) {
         showToast("error", response.message || "Something went wrong!");
       } else {
-        showToast("success", response.message || "Product updated successfully!");
+        showToast(
+          "success",
+          response.message || "Product updated successfully!"
+        );
       }
     } catch (error) {
       showToast(
@@ -161,12 +156,6 @@ function EditProduct() {
     }
   };
 
-  // ✅ Editor content sync
-  const handleEditorChange = (_, editor) => {
-    const data = editor.getData();
-    form.setValue("description", data);
-  };
-
   return (
     <div>
       <BreadCrumb breadCrumbData={breadCrumbData} />
@@ -175,129 +164,150 @@ function EditProduct() {
         <Card className="w-[75%] shadow-2xl mt-20">
           <CardHeader>
             <CardTitle className="text-center text-3xl font-bold font-[Pacifico] text-primary">
-              Edit Product
+              Update Product Variant
             </CardTitle>
           </CardHeader>
 
           <CardContent>
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(productUpdateHandler)}
+                onSubmit={form.handleSubmit(productVariantUpdateHandler)}
                 className="space-y-2 grid md:grid-cols-2 gap-5"
               >
-                {/* Product Name */}
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="product"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Product *</FormLabel>
+                      <FormLabel>
+                        Select Product Variant{" "}
+                        <span className="text-red-500 ">*</span>
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter Product name" {...field} />
+                        <Select
+                          options={productOptions}
+                          selected={field.value}
+                          setSelected={field.onChange}
+                          isMulti={false}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="sku"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        SKU <span className="text-red-500 ">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter sku" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="color"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Variant Color <span className="text-red-500 ">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter Variant color"
+                          type={"text"}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="size"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Size <span className="text-red-500 ">*</span>
+                      </FormLabel>
+                      <FormControl>
+                        <Select
+                          options={sizes}
+                          selected={field.value}
+                          setSelected={field.onChange}
+                          isMulti={false}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* Slug */}
-                <FormField
-                  control={form.control}
-                  name="slug"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Slug *</FormLabel>
-                      <FormControl>
-                        <Input readOnly {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                {/* Category */}
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category *</FormLabel>
-                      <FormControl>
-                        <Select
-                          options={categoryOptions}
-                          selected={field.value}
-                          setSelected={field.onChange}
-                          isMulti={false}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                {/* MRP */}
                 <FormField
                   control={form.control}
                   name="mrp"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>MRP *</FormLabel>
+                      <FormLabel>
+                        MRP<span className="text-red-500 ">*</span>
+                      </FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} />
+                        <Input
+                          placeholder="Enter Mrp"
+                          type="number"
+                          {...field}
+                        />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
-
-                {/* Selling Price */}
                 <FormField
                   control={form.control}
                   name="sellingPrice"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Selling Price *</FormLabel>
+                      <FormLabel>
+                        Original Price<span className="text-red-500 ">*</span>
+                      </FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} />
+                        <Input
+                          placeholder="Enter Selling Price"
+                          type="number"
+                          {...field}
+                          step={5}
+                        />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
-
-                {/* Discount */}
                 <FormField
                   control={form.control}
                   name="discountPercentage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Discount %</FormLabel>
+                      <FormLabel>Discount Percentage</FormLabel>
                       <FormControl>
-                        <Input readOnly {...field} />
+                        <Input
+                          placeholder="Enter discount %"
+                          type="number"
+                          readOnly
+                          {...field}
+                        />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* Description */}
-                <div className="md:col-span-2">
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description *</FormLabel>
-                        <FormControl>
-                          <div className="w-[99%]">
-                            <Editor
-                              key={field.value}
-                              onChange={handleEditorChange}
-                              initialData={field.value || ""}
-                            />
-                          </div>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* Media Section */}
                 <div className="md:col-span-2 border border-dashed rounded p-5 text-center">
                   <MediaModal
                     open={open}
@@ -306,46 +316,39 @@ function EditProduct() {
                     setSelectedMedia={setSelectedMedia}
                     isMultiple={true}
                   />
-
                   {selectedMedia.length > 0 && (
-                    <div className="flex justify-center items-center flex-wrap gap-2 mt-3">
-                      {selectedMedia.map((media, idx) => (
-                        <div
-                          key={idx}
-                          className="h-24 w-24 border rounded overflow-hidden"
-                        >
-                          <Image
-                            src={
-                              media.secure_url ||
-                              media.url ||
-                              "/placeholder.png"
+                    <>
+                      <div className="flex justify-center items-center flex-wrap mb-3 gap-2">
+                        {selectedMedia.map((media) => (
+                          <div className="h-24 w-24 border" key={media._id}>
+                            {
+                              <div className="size-full flex items-center justify-center">
+                                {media?.length > 0 &&
+                                  media.map((m) => (
+                                    <Image
+                                      src={m.path}
+                                      alt={m.alt || ""}
+                                      className="size-full object-cover"
+                                      height={100}
+                                      width={100}
+                                    />
+                                  ))}
+                              </div>
                             }
-                            alt={media.alt || "Media Image"}
-                            width={100}
-                            height={100}
-                            className="object-cover w-full h-full"
-                          />
-                        </div>
-                      ))}
-                    </div>
+                          </div>
+                        ))}
+                      </div>
+                    </>
                   )}
-
                   <div
-                    className="bg-gray-50 dark:bg-card border w-[200px] mx-auto p-5 cursor-pointer mt-3"
+                    className="bg-gray-50 dark:bg-card border w-[200px] mx-auto p-5 cursor-pointer"
                     onClick={() => setOpen(true)}
                   >
-                    Select Media
+                    <span className="">Select Media</span>
                   </div>
                 </div>
 
-                {/* Submit */}
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="md:col-span-2 w-50 rounded-full mt-4 cursor-pointer"
-                >
-                  {loading ? "Updating..." : "Update Product"}
-                </Button>
+                <ButtonLoading type="submit" loading={loading} text="Update Variant"/>
               </form>
             </Form>
           </CardContent>
@@ -355,4 +358,4 @@ function EditProduct() {
   );
 }
 
-export default EditProduct;
+export default EditProductVariant;

@@ -4,7 +4,7 @@ import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/serverHelper";
 import { zSchema } from "@/lib/zodSchema";
-import ProductModel from "@/models/product.model";
+import ProductVariantModel from "@/models/ProductVariant.model";
 
 // Adding Product
 export async function PUT(request) {
@@ -21,14 +21,16 @@ export async function PUT(request) {
 
     // ✅ Parse body
     const payload = await request.json();
+    // ✅ Validate with Zod schema
     const schema = zSchema.pick({
       _id: true,
-      name: true,
-      slug: true,
+      product: true,
+      sku: true,
+      color: true,
+      size: true,
       mrp: true,
       sellingPrice: true,
       discountPercentage: true,
-      description: true,
       media: true,
     });
 
@@ -39,17 +41,18 @@ export async function PUT(request) {
 
     const {
       _id,
-      name,
-      slug,
+      product,
+      sku,
+      color,
+      size,
       mrp,
       sellingPrice,
       discountPercentage,
-      description,
       media,
     } = validateData.data;
 
     // ✅ Check duplicate
-    const getProduct = await ProductModel.findOne({
+    const getProduct = await ProductVariantModel.findOne({
       deletedAt: null,
       _id,
     });
@@ -57,75 +60,20 @@ export async function PUT(request) {
       return response(false, 404, "This product not found");
     }
     // ✅ Create product
-    getProduct.name = name;
-    getProduct.slug = slug;
-    getProduct.mrp = mrp;
-    getProduct.sellingPrice = sellingPrice;
-    getProduct.discountPercentage = discountPercentage;
-    getProduct.description = description;
-    getProduct.media = media;
+getProduct._id = _id
+getProduct.product = product
+getProduct.sku = sku
+getProduct.color = color
+getProduct.size = size
+getProduct.mrp = mrp
+getProduct.sellingPrice = sellingPrice
+getProduct.discountPercentage = discountPercentage
+getProduct.media = media
     await getProduct.save();
 
-    return response(true, 200, "Product updated successfully");
+    return response(true, 200, "Product variant updated successfully");
   } catch (error) {
     console.error("[PRODUCT CREATE ERROR]:", error);
     return catchError(error, error.message || "Internal Server Error");
   }
 }
-
-// // Get product details
-// export const getCategoryDetails = async (req, res, next) => {
-//    try {
-//     const { categoryid } = req.params;
-
-//     const product = await Product.findById(categoryid);
-//     if (!product) return next(handleError(404, "Product not found"));
-
-//     res.status(200).json({
-//       product,
-//     });
-//   } catch (error) {
-//     next(handleError(500, "Error from product controller"));
-//   }
-// };
-// // Delete Categories
-// export const deleteCategory = async (req, res, next) => {
-//   try {
-//     const { categoryid } = req.params;
-//     const deletedCategory = await Product.findByIdAndDelete(categoryid);
-
-//     if (!deletedCategory) {
-//       return next(handleError(404, "Product not found"));
-//     }
-
-//     res.status(200).json({
-//       success: true,
-//       message: "Product deleted successfully",
-//     });
-//   } catch (error) {
-//     return next(handleError(400, error.message || "Error deleting product!"));
-//   }
-// };
-// // Update product logic goes here
-// export const updateCategory = async (req, res, next) => {
-//   try {
-//     const { name, slug } = req.body;
-//     const { categoryid } = req.params;
-//     const product = await Product.findByIdAndUpdate(
-//       categoryid,
-//       {
-//         name,
-//         slug,
-//       },
-//       { new: true }
-//     );
-
-//     res.status(200).json({
-//       success: true,
-//       message: "Product updated",
-//       product,
-//     });
-//   } catch (error) {
-//     next(handleError(500, "Error from product controller"));
-//   }
-// };
