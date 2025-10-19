@@ -38,7 +38,7 @@ const breadCrumbData = [
   },
 ];
 
-function ShowProduct() {
+function ShowProductVariant() {
   const columns = useMemo(() => {
     return columnConfig(DT_PRODUCT_VARIANT_COLUMN);
   }, []);
@@ -54,7 +54,7 @@ function ShowProduct() {
         handleDelete={handleDelete}
         row={row}
         deleteType={deleteType}
-      />
+      />  
     );
     return actionMenu;
   }, []);
@@ -74,14 +74,14 @@ function ShowProduct() {
         </CardHeader>
         <CardContent className="pb-5">
           <DatatableWrapper
-            queryKey="product-data"
+            queryKey="product-variant-data"
             fetchUrl="/api/product-variant"
             columnConfig={columns}
             initialPageSize={10}
             exportEndpoint="/api/product-variant/export"
             deleteEndpoint="/api/product-variant/delete"
             deleteType="SD"
-            trashView={`${ADMIN_TRASH}?trashof=product`}
+            trashView={`${ADMIN_TRASH}?trashof=product-variant`}
             createAction={action}
           />
         </CardContent>
@@ -90,4 +90,4 @@ function ShowProduct() {
   );
 }
 
-export default ShowProduct;
+export default ShowProductVariant;
