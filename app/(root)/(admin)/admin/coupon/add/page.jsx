@@ -15,10 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { showToast } from "@/lib/showToast";
 import BreadCrumb from "@/components/application/admin/BreadCrumb";
-import {
-  ADMIN_DASHBOARD,
-  ADMIN_COUPON_SHOW,
-} from "@/routes/AdminPanelRoute";
+import { ADMIN_DASHBOARD, ADMIN_COUPON_SHOW } from "@/routes/AdminPanelRoute";
 import { zSchema } from "@/lib/zodSchema";
 import axios from "axios";
 
@@ -39,26 +36,24 @@ const breadCrumbData = [
 
 function AddCounpon() {
   //Form schema
-  const formSchema = zSchema.pick({
-    name: true,
-    slug: true,
-    category: true,
-    mrp: true,
-    sellingPrice: true,
-    discountPercentage: true,
-    description: true,
-  });
+  const schema = zSchema
+    .pick({
+      code: true,
+      discountPercentage: true,
+      minShoppingAmount: true,
+      validity: true,
+    })
+    .extend({
+      validity: z.string(), // accept date as string instead of coercing
+    });
   // initialize form
   const form = useForm({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
-      name: "",
-      slug: "",
-      category: "",
-      mrp: "",
-      sellingPrice: "",
+      code: "",
       discountPercentage: "",
-      description: "",
+      minShoppingAmount: "",
+      validity: "",
     },
   });
   // 2. Define a submit handler.
@@ -127,6 +122,42 @@ function AddCounpon() {
                         <Input
                           placeholder="Enter discount %"
                           type="number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="minShoppingAmount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Min. Shopping Amount</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter min Shopping Amount"
+                          type="number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="validity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Validity</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter min Shopping Amount"
+                          type="date"
                           {...field}
                         />
                       </FormControl>
