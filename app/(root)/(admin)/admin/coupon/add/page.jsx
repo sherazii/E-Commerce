@@ -15,7 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { showToast } from "@/lib/showToast";
 import BreadCrumb from "@/components/application/admin/BreadCrumb";
-import { ADMIN_DASHBOARD, ADMIN_COUPON_SHOW } from "@/routes/AdminPanelRoute";
+import { ADMIN_DASHBOARD, ADMIN_COUPON_SHOW, ADMIN_COUPON_ADD } from "@/routes/AdminPanelRoute";
 import { couponSchema, zSchema } from "@/lib/zodSchema";
 import axios from "axios";
 
@@ -29,7 +29,7 @@ const breadCrumbData = [
     label: "Coupon",
   },
   {
-    href: "",
+    href: ADMIN_COUPON_ADD,
     label: "Add Coupon",
   },
 ];

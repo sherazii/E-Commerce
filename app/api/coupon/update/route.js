@@ -20,7 +20,6 @@ export async function PUT(request) {
 
     // ✅ Parse body
     const payload = await request.json();
-    console.log(payload);
     
 
     // ✅ Validation schema
