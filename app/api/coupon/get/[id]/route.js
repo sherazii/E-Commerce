@@ -1,12 +1,11 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/serverHelper";
-import ProductModel from "@/models/product.model";
+import CuponModel from "@/models/Coupon.model";
 import { isValidObjectId } from "mongoose";
-import MediaModel from "@/models/media.model";
 
+// ✅ Get single coupon by ID
 export async function GET(request, { params }) {
-    
   try {
     // ✅ Authentication
     const auth = await isAuthenticated("admin");
@@ -14,31 +13,30 @@ export async function GET(request, { params }) {
       return response(false, 403, "Unauthorized");
     }
 
+    // ✅ Connect DB
     await connectDB();
 
-    // ✅ Await params (since Next.js 15 treats it as a Promise)
+    // ✅ Await params (Next.js 15 uses async params)
     const { id } = await params;
 
     // ✅ Validate ID
-    if (!isValidObjectId(id)) {
-      return response(false, 400, "Invalid Object ID");
+    if (!id || !isValidObjectId(id)) {
+      return response(false, 400, "Invalid or missing Object ID");
     }
 
-    // ✅ Fetch product and populate references
-    const product = await ProductModel.findOne({
+    // ✅ Fetch coupon
+    const coupon = await CuponModel.findOne({
       _id: id,
       deletedAt: null,
-    })
-      .populate("media") // gets media details (secure_url, etc.)
-      .populate("category", "name _id") // gets category info
-      .lean();
+    }).lean();
 
-    if (!product) {
-      return response(false, 404, "No product found");
+    if (!coupon) {
+      return response(false, 404, "Coupon not found");
     }
 
-    return response(true, 200, "Product found", product);
+    return response(true, 200, "Coupon found successfully", coupon);
   } catch (error) {
-    return catchError(error);
+    console.error("❌ [COUPON GET ERROR]:", error);
+    return catchError(error, "Failed to fetch coupon");
   }
 }

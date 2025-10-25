@@ -57,7 +57,7 @@ export async function POST(request) {
     });
 
     // ✅ Success response
-    return response(true, 200, "Coupon created successfully", newCoupon);
+    return response(true, 200, "Coupon created successfully");
   } catch (error) {
     console.error("[COUPON CREATE ERROR]:", error);
     return catchError(error, error.message || "Internal Server Error");

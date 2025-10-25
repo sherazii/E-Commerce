@@ -1,33 +1,43 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/serverHelper";
-import ProductModel from "@/models/product.model";
+import CuponModel from "@/models/Coupon.model";
 import { NextResponse } from "next/server";
 
-// Get all products
+// ✅ Get all coupons
 export async function GET(request) {
   try {
     // ✅ Authentication check
     const auth = await isAuthenticated("admin");
     if (!auth.isAuthenticated) {
-      return response(false, 403, "Unauthorised");
+      return response(false, 403, "Unauthorized");
     }
 
     // ✅ Connect to DB
     await connectDB();
 
+    // ✅ Parse query params
     const searchParams = request.nextUrl.searchParams;
     const start = parseInt(searchParams.get("start") || "0", 10);
     const size = parseInt(searchParams.get("size") || "10", 10);
-    const filters = JSON.parse(searchParams.get("filters") || "[]");
     const globalFilter = searchParams.get("globalFilter") || "";
-    const sorting = JSON.parse(searchParams.get("sorting") || "[]");
     const deleteType = searchParams.get("deleteType");
 
-    // ✅ Build match query
+    const safeParse = (param, fallback) => {
+      try {
+        return JSON.parse(param || fallback);
+      } catch {
+        return JSON.parse(fallback);
+      }
+    };
+
+    const filters = safeParse(searchParams.get("filters"), "[]");
+    const sorting = safeParse(searchParams.get("sorting"), "[]");
+
+    // ✅ Match query
     let matchQuery = {};
     if (deleteType === "SD") {
-      matchQuery.deletedAt = null;
+      matchQuery.deletedAt = { $in: [null, undefined] };
     } else if (deleteType === "PD") {
       matchQuery.deletedAt = { $ne: null };
     }
@@ -35,82 +45,40 @@ export async function GET(request) {
     // ✅ Column-based filters
     filters.forEach((filter) => {
       if (
-        filter.id === "mrp" ||
-        filter.id === "sellingPrice" ||
+        filter.id === "minShoppingAmount" ||
         filter.id === "discountPercentage"
       ) {
         matchQuery[filter.id] = Number(filter.value);
+      } else if (filter.id === "validity") {
+        matchQuery[filter.id] = new Date(filter.value);
       } else {
         matchQuery[filter.id] = { $regex: filter.value, $options: "i" };
       }
     });
 
     // ✅ Sorting
-    let sortQuery = {};
+    const sortQuery = {};
     sorting.forEach((sort) => {
       sortQuery[sort.id] = sort.desc ? -1 : 1;
     });
 
-    // ✅ Build aggregation pipeline
-    const aggregatePipeline = [
-      {
-        $lookup: {
-          from: "categories",
-          localField: "category",
-          foreignField: "_id",
-          as: "categoryData",
-        },
-      },
-      {
-        $unwind: {
-          path: "$categoryData",
-          preserveNullAndEmptyArrays: true,
-        },
-      },
-      { $match: matchQuery },
-    ];
+    // ✅ Aggregation pipeline
+    const aggregatePipeline = [{ $match: matchQuery }];
 
-    // ✅ Global search — must be after lookup/unwind
+    // ✅ Global search
     if (globalFilter) {
+      const regex = new RegExp(globalFilter, "i");
       aggregatePipeline.push({
         $match: {
           $or: [
-            { name: { $regex: globalFilter, $options: "i" } },
-            { slug: { $regex: globalFilter, $options: "i" } },
-            { "categoryData.name": { $regex: globalFilter, $options: "i" } },
-            {
-              $expr: {
-                $regexMatch: {
-                  input: { $toString: "$mrp" },
-                  regex: globalFilter,
-                  options: "i",
-                },
-              },
-            },
-            {
-              $expr: {
-                $regexMatch: {
-                  input: { $toString: "$sellingPrice" },
-                  regex: globalFilter,
-                  options: "i",
-                },
-              },
-            },
-            {
-              $expr: {
-                $regexMatch: {
-                  input: { $toString: "$discountPercentage" },
-                  regex: globalFilter,
-                  options: "i",
-                },
-              },
-            },
+            { code: regex },
+            { discountPercentage: regex },
+            { minShoppingAmount: regex },
           ],
         },
       });
     }
 
-    // Continue pipeline
     aggregatePipeline.push(
       { $sort: Object.keys(sortQuery).length ? sortQuery : { createdAt: -1 } },
       { $skip: start },
@@ -118,12 +86,10 @@ export async function GET(request) {
       {
         $project: {
           _id: 1,
-          name: 1,
-          slug: 1,
-          mrp: 1,
-          sellingPrice: 1,
+          code: 1,
           discountPercentage: 1,
-          category: "$categoryData.name",
+          minShoppingAmount: 1,
+          validity: 1,
           createdAt: 1,
           updatedAt: 1,
           deletedAt: 1,
@@ -131,19 +97,18 @@ export async function GET(request) {
       }
     );
 
-    // ✅ Execute query
-    const getProduct = await ProductModel.aggregate(aggregatePipeline);
+    // ✅ Query + Count
+    const getCoupon = await CuponModel.aggregate(aggregatePipeline);
+    const totalRowCount = await CuponModel.countDocuments(matchQuery);
 
-    // ✅ Count total rows (excluding pagination)
-    const totalRowCount = await ProductModel.countDocuments(matchQuery);
-
+    // ✅ Success response
     return NextResponse.json({
       success: true,
-      data: getProduct,
+      data: getCoupon,
       meta: { totalRowCount },
     });
   } catch (error) {
-    console.error("❌ Product GET error:", error);
+    console.error("❌ Coupon GET error:", error);
     return catchError(error, error.message || "Internal Server Error");
   }
 }

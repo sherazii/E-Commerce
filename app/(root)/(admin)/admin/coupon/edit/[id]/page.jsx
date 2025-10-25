@@ -15,157 +15,100 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { showToast } from "@/lib/showToast";
-import slugify from "slugify";
 import BreadCrumb from "@/components/application/admin/BreadCrumb";
-import { ADMIN_DASHBOARD, ADMIN_PRODUCT_SHOW } from "@/routes/AdminPanelRoute";
-import { zSchema } from "@/lib/zodSchema";
+import {
+  ADMIN_COUPON_SHOW,
+  ADMIN_DASHBOARD,
+} from "@/routes/AdminPanelRoute";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import useFetch from "@/hooks/useFetch";
-import MediaModal from "@/components/application/admin/MediaModal";
-import Select from "@/components/application/Select";
-import Editor from "@/components/application/admin/Editor";
-import Image from "next/image";
 import { useParams } from "next/navigation";
+import { couponSchema } from "@/lib/zodSchema";
+import ButtonLoading from "@/components/application/ButtonLoading";
 
 const breadCrumbData = [
   { href: ADMIN_DASHBOARD, label: "Home" },
-  { href: ADMIN_PRODUCT_SHOW, label: "Product" },
-  { href: "", label: "Edit Product" },
+  { href: ADMIN_COUPON_SHOW, label: "Coupon" },
+  { href: "", label: "Edit Coupon" },
 ];
-
-const formSchema = z.object({
-  _id: z.string().optional(),
-  name: z.string().min(3, "Product name is required"),
-  slug: z.string().min(2, "Slug is required"),
-  mrp: z.coerce.number().positive("MRP must be positive"),
-  sellingPrice: z.coerce.number().positive("Selling price must be positive"),
-  discountPercentage: z.coerce.number().min(0).max(100),
-  description: z.string().min(3, "Description is required"),
-  category: z.string().optional(),
-  media: z.array(
-    z.object({
-      _id: z.string(),
-      url: z.string().optional(),
-    })
-  ),
-});
-
 
 function EditProduct() {
   const { id } = useParams(); // ✅ Correct way to get dynamic param
-  
-  const [categoryOptions, setCategoryOptions] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [selectedMedia, setSelectedMedia] = useState([]);
+
   const [loading, setLoading] = useState(false);
 
-  const { data: categoryData } = useFetch(`/api/category?deleteType=SD&&size=10000`);
-  const { data: productData } = useFetch(`/api/product/get/${id}`);
-
-  // ✅ Initialize form
+  const { data: couponData } = useFetch(
+    `/api/coupon?deleteType=SD&&size=10000`
+  );
+  //Form schema
+  const schema = couponSchema
+    .pick({
+      _id:true,
+      code: true,
+      discountPercentage: true,
+      minShoppingAmount: true,
+      validity: true,
+    })
+    .extend({
+      validity: z.string(), // accept date as string instead of coercing
+    });
+  // initialize form
   const form = useForm({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
-      name: "",
-      slug: "",
-      mrp: "",
-      sellingPrice: "",
+      _id: id,
+      code: "",
       discountPercentage: "",
-      description: "",
-      media: [],
-      category: "",
+      minShoppingAmount: "",
+      validity: "",
     },
   });
+  
 
-  // ✅ Populate category dropdown
+  // ✅ Pre-fill form when coupon data loads
   useEffect(() => {
-    if (categoryData?.success) {
-      const options = categoryData.data.map((cat) => ({
-        label: cat.name,
-        value: cat._id,
-      }));
-      setCategoryOptions(options);
-    }
-  }, [categoryData]);
-
-  // ✅ Pre-fill form when product data loads
-  useEffect(() => {
-    if (productData?.success) {
-      const data = productData.data;
+    if (couponData?.success) {
+      const data = couponData.data;
+      
 
       form.reset({
-        name: data.name || "",
-        slug: data.slug || "",
-        mrp: data.mrp || "",
-        sellingPrice: data.sellingPrice || "",
-        discountPercentage: data.discountPercentage || "",
-        description: data.description || "",
-        category: data.category?._id || "",
-        media: data.media || [],
-        _id: id,
+        _id: data[0]._id,
+        code: data[0].code,
+        discountPercentage: data[0].discountPercentage,
+        minShoppingAmount: data[0].minShoppingAmount,
+        validity: data[0].validity,
       });
-
-      setSelectedMedia(data.media || []);
     }
-  }, [productData]);
+  }, [couponData]);
 
-  // ✅ Auto-generate slug
-  const productName = form.watch("name");
-  useEffect(() => {
-    if (productName) {
-      form.setValue(
-        "slug",
-        slugify(productName, { lower: true, strict: true })
-      );
-    }
-  }, [productName]);
-
-  // ✅ Auto-calculate discount
-  const mrp = form.watch("mrp");
-  const sellingPrice = form.watch("sellingPrice");
-  useEffect(() => {
-    const mrpVal = parseFloat(mrp) || 0;
-    const sellVal = parseFloat(sellingPrice) || 0;
-    const discount = mrpVal
-      ? (((mrpVal - sellVal) / mrpVal) * 100).toFixed(2)
-      : 0;
-    form.setValue("discountPercentage", discount);
-  }, [mrp, sellingPrice]);
-
-  // ✅ Update product handler
-  const productUpdateHandler = async (data) => {
-    console.log("trigger"); // should now appear in console
+  // ✅ Update coupon handler
+  const couponUpdateHandler = async (data) => {
     setLoading(true);
-
+    
+ 
     try {
-      const payload = {
-        ...data,
-        media: selectedMedia.map((m) => m._id || m),
-      };
 
-      const { data: response } = await axios.put(`/api/product/update`, payload);
+      const { data: response } = await axios.put(`/api/coupon/update`, data);
 
       if (!response.success) {
         showToast("error", response.message || "Something went wrong!");
       } else {
-        showToast("success", response.message || "Product updated successfully!");
+        showToast(
+          "success",
+          response.message || "Coupon updated successfully!"
+        );
       }
     } catch (error) {
       showToast(
         "error",
-        error?.response?.data?.message || "Error updating product"
+        error?.response?.data?.message || "Error updating coupon"
       );
     } finally {
       setLoading(false);
     }
   };
 
-  // ✅ Editor content sync
-  const handleEditorChange = (_, editor) => {
-    const data = editor.getData();
-    form.setValue("description", data);
-  };
 
   return (
     <div>
@@ -175,177 +118,87 @@ function EditProduct() {
         <Card className="w-[75%] shadow-2xl mt-20">
           <CardHeader>
             <CardTitle className="text-center text-3xl font-bold font-[Pacifico] text-primary">
-              Edit Product
+              Edit Coupon
             </CardTitle>
           </CardHeader>
 
           <CardContent>
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(productUpdateHandler)}
+                onSubmit={form.handleSubmit(couponUpdateHandler)}
                 className="space-y-2 grid md:grid-cols-2 gap-5"
               >
-                {/* Product Name */}
                 <FormField
                   control={form.control}
-                  name="name"
+                  name="code"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Product *</FormLabel>
+                      <FormLabel>
+                        Code <span className="text-red-500 ">*</span>
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter Product name" {...field} />
+                        <Input placeholder="Enter Code" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* Slug */}
-                <FormField
-                  control={form.control}
-                  name="slug"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Slug *</FormLabel>
-                      <FormControl>
-                        <Input readOnly {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                {/* Category */}
-                <FormField
-                  control={form.control}
-                  name="category"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Category *</FormLabel>
-                      <FormControl>
-                        <Select
-                          options={categoryOptions}
-                          selected={field.value}
-                          setSelected={field.onChange}
-                          isMulti={false}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                {/* MRP */}
-                <FormField
-                  control={form.control}
-                  name="mrp"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>MRP *</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                {/* Selling Price */}
-                <FormField
-                  control={form.control}
-                  name="sellingPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Selling Price *</FormLabel>
-                      <FormControl>
-                        <Input type="number" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                {/* Discount */}
                 <FormField
                   control={form.control}
                   name="discountPercentage"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Discount %</FormLabel>
+                      <FormLabel>Discount Percentage</FormLabel>
                       <FormControl>
-                        <Input readOnly {...field} />
+                        <Input
+                          placeholder="Enter discount %"
+                          type="number"
+                          {...field}
+                        />
                       </FormControl>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />
 
-                {/* Description */}
-                <div className="md:col-span-2">
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description *</FormLabel>
-                        <FormControl>
-                          <div className="w-[99%]">
-                            <Editor
-                              key={field.value}
-                              onChange={handleEditorChange}
-                              initialData={field.value || ""}
-                            />
-                          </div>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* Media Section */}
-                <div className="md:col-span-2 border border-dashed rounded p-5 text-center">
-                  <MediaModal
-                    open={open}
-                    setOpen={setOpen}
-                    selectedMedia={selectedMedia}
-                    setSelectedMedia={setSelectedMedia}
-                    isMultiple={true}
-                  />
-
-                  {selectedMedia.length > 0 && (
-                    <div className="flex justify-center items-center flex-wrap gap-2 mt-3">
-                      {selectedMedia.map((media, idx) => (
-                        <div
-                          key={idx}
-                          className="h-24 w-24 border rounded overflow-hidden"
-                        >
-                          <Image
-                            src={
-                              media.secure_url ||
-                              media.url ||
-                              "/placeholder.png"
-                            }
-                            alt={media.alt || "Media Image"}
-                            width={100}
-                            height={100}
-                            className="object-cover w-full h-full"
-                          />
-                        </div>
-                      ))}
-                    </div>
+                <FormField
+                  control={form.control}
+                  name="minShoppingAmount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Min. Shopping Amount</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter min Shopping Amount"
+                          type="number"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
+                />
 
-                  <div
-                    className="bg-gray-50 dark:bg-card border w-[200px] mx-auto p-5 cursor-pointer mt-3"
-                    onClick={() => setOpen(true)}
-                  >
-                    Select Media
-                  </div>
-                </div>
+                <FormField
+                  control={form.control}
+                  name="validity"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Validity</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter min Shopping Amount"
+                          type="date"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-                {/* Submit */}
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="md:col-span-2 w-50 rounded-full mt-4 cursor-pointer"
-                >
-                  {loading ? "Updating..." : "Update Product"}
-                </Button>
+                <ButtonLoading type="submit" text="Update Coupon" loading={loading}/>
               </form>
             </Form>
           </CardContent>

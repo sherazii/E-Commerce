@@ -1,7 +1,7 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
 import { isAuthenticated } from "@/lib/serverHelper";
-import ProductModel from "@/models/product.model";
+import CuponModel from "@/models/Coupon.model";
 
 /**
  * PUT → Soft Delete (SD) or Restore (RSD)
@@ -14,46 +14,45 @@ export async function PUT(request) {
       return response(false, 403, "Unauthorized");
     }
 
-    // ✅ DB Connection
+    // ✅ Connect to DB
     await connectDB();
 
-    // ✅ Extract payload
+    // ✅ Extract and validate payload
     const { ids = [], deleteType } = await request.json();
 
-    // ✅ Validate IDs
     if (!Array.isArray(ids) || ids.length === 0) {
-      return response(false, 400, "Invalid or Empty ID list");
+      return response(false, 400, "Invalid or empty ID list");
     }
 
-    // ✅ Check if records exist
-    const products = await ProductModel.find({ _id: { $in: ids } });
-    if (!products.length) {
-      return response(false, 400, "Data not found");
-    }
-
-    // ✅ Validate deleteType
     if (!["SD", "RSD"].includes(deleteType)) {
       return response(
         false,
         400,
-        "deleteType must be SD (Soft Delete) or RSD (Restore)"
+        "deleteType must be 'SD' (Soft Delete) or 'RSD' (Restore)"
       );
     }
 
-    // ✅ Soft Delete or Restore using updateMany
+    // ✅ Check existence
+    const coupons = await CuponModel.find({ _id: { $in: ids } });
+    if (!coupons.length) {
+      return response(false, 404, "Coupons not found");
+    }
+
+    // ✅ Apply soft delete or restore
     const updateValue =
       deleteType === "SD" ? { deletedAt: new Date() } : { deletedAt: null };
-    await ProductModel.updateMany(
-      { _id: { $in: ids } },
-      { $set: updateValue }
-    );
+
+    await CuponModel.updateMany({ _id: { $in: ids } }, { $set: updateValue });
 
     return response(
       true,
       200,
-      deleteType === "SD" ? "Moved to trash" : "Restored successfully"
+      deleteType === "SD"
+        ? "Coupons moved to trash successfully"
+        : "Coupons restored successfully"
     );
   } catch (error) {
+    console.error("❌ [COUPON PUT ERROR]:", error);
     return catchError(error);
   }
 }
@@ -69,35 +68,32 @@ export async function DELETE(request) {
       return response(false, 403, "Unauthorized");
     }
 
+    // ✅ Connect to DB
     await connectDB();
 
-    // ✅ Extract payload
+    // ✅ Extract and validate payload
     const { ids = [], deleteType } = await request.json();
 
     if (!Array.isArray(ids) || ids.length === 0) {
-      return response(false, 400, "Invalid or Empty ID list");
+      return response(false, 400, "Invalid or empty ID list");
     }
 
-    // ✅ Validate deleteType strictly for permanent delete
     if (deleteType !== "PD") {
-      return response(
-        false,
-        400,
-        "deleteType must be PD for permanent deletion"
-      );
+      return response(false, 400, "deleteType must be 'PD' for permanent deletion");
     }
 
-    // ✅ Confirm data exists
-    const products = await ProductModel.find({ _id: { $in: ids } }).lean();
-    if (!products.length) {
-      return response(false, 400, "Data not found");
+    // ✅ Check existence
+    const coupons = await CuponModel.find({ _id: { $in: ids } }).lean();
+    if (!coupons.length) {
+      return response(false, 404, "Coupons not found");
     }
 
-    // ✅ Delete from database
-    await ProductModel.deleteMany({ _id: { $in: ids } });
+    // ✅ Permanently delete
+    await CuponModel.deleteMany({ _id: { $in: ids } });
 
-    return response(true, 200, "Data permanently deleted");
+    return response(true, 200, "Coupons permanently deleted");
   } catch (error) {
+    console.error("❌ [COUPON DELETE ERROR]:", error);
     return catchError(error);
   }
 }

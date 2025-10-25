@@ -5,16 +5,16 @@ import DeleteAction from "@/components/application/admin/DeleteAction";
 import EditAction from "@/components/application/admin/EditAction";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {  DT_PRODUCT_COLUMN } from "@/lib/column";
+import { DT_COUPON_COLUMN } from "@/lib/column";
 import { columnConfig } from "@/lib/helperFunction";
-import { showToast } from "@/lib/showToast";
 import {
+  ADMIN_COUPON_ADD,
+  ADMIN_COUPON_EDIT,
+  ADMIN_COUPON_SHOW,
   ADMIN_DASHBOARD,
-  ADMIN_PRODUCT_ADD,
-  ADMIN_PRODUCT_EDIT,
-  ADMIN_PRODUCT_SHOW,
   ADMIN_TRASH,
 } from "@/routes/AdminPanelRoute";
+
 import axios from "axios";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -26,24 +26,24 @@ const breadCrumbData = [
     label: "Home",
   },
   {
-    href: ADMIN_PRODUCT_SHOW,
-    label: "Product",
+    href: ADMIN_COUPON_SHOW,
+    label: "Coupon",
   },
   {
-    href: ADMIN_PRODUCT_ADD,
-    label: "Add Product",
+    href: ADMIN_COUPON_ADD,
+    label: "Add Coupon",
   },
 ];
 
 function ShowProduct() {
   const columns = useMemo(() => {
-    return columnConfig(DT_PRODUCT_COLUMN);
+    return columnConfig(DT_COUPON_COLUMN);
   }, []);
 
   const action = useCallback((row, deleteType, handleDelete) => {
     let actionMenu = [];
     actionMenu.push(
-      <EditAction href={ADMIN_PRODUCT_EDIT(row.original._id)} key="edit" />
+      <EditAction href={ADMIN_COUPON_EDIT(row.original._id)} key="edit" />
     );
     actionMenu.push(
       <DeleteAction
@@ -62,23 +62,23 @@ function ShowProduct() {
       <Card className="py-0 rounded shadow-sm">
         <CardHeader className="pt-3 px-3 border-b [.border-b]:pb-2">
           <div className="flex items-center justify-between">
-            <h4 className="text-xl font-semibold">Products Details</h4>
+            <h4 className="text-xl font-semibold">Coupons Details</h4>
             <Button>
               <FiPlus />
-              <Link href={ADMIN_PRODUCT_ADD}>New Product</Link>
+              <Link href={ADMIN_COUPON_ADD}>New Coupon</Link>
             </Button>
           </div>
         </CardHeader>
         <CardContent className="pb-5">
           <DatatableWrapper
-            queryKey="product-data"
-            fetchUrl="/api/product"
+            queryKey="coupon-data"
+            fetchUrl="/api/coupon"
             columnConfig={columns}
             initialPageSize={10}
-            exportEndpoint="/api/product/export"
-            deleteEndpoint="/api/product/delete"
+            exportEndpoint="/api/coupon/export"
+            deleteEndpoint="/api/coupon/delete"
             deleteType="SD"
-            trashView={`${ADMIN_TRASH}?trashof=product`}
+            trashView={`${ADMIN_TRASH}?trashof=coupon`}
             createAction={action}
           />
         </CardContent>
