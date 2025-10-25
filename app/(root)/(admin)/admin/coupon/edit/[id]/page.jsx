@@ -39,8 +39,9 @@ function EditProduct() {
   const [loading, setLoading] = useState(false);
 
   const { data: couponData } = useFetch(
-    `/api/coupon?deleteType=SD&&size=10000`
+    `/api/coupon/get/${id}`
   );
+  
   //Form schema
   const schema = couponSchema
     .pick({
@@ -65,6 +66,8 @@ function EditProduct() {
     },
   });
   
+  console.log(couponData);
+  
 
   // ✅ Pre-fill form when coupon data loads
   useEffect(() => {
@@ -73,11 +76,11 @@ function EditProduct() {
       
 
       form.reset({
-        _id: data[0]._id,
-        code: data[0].code,
-        discountPercentage: data[0].discountPercentage,
-        minShoppingAmount: data[0].minShoppingAmount,
-        validity: data[0].validity,
+        _id: data._id,
+        code: data.code,
+        discountPercentage: data.discountPercentage,
+        minShoppingAmount: data.minShoppingAmount,
+        validity: data.validity,
       });
     }
   }, [couponData]);
