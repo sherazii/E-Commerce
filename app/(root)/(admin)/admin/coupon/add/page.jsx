@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import { showToast } from "@/lib/showToast";
 import BreadCrumb from "@/components/application/admin/BreadCrumb";
 import { ADMIN_DASHBOARD, ADMIN_COUPON_SHOW } from "@/routes/AdminPanelRoute";
-import { zSchema } from "@/lib/zodSchema";
+import { couponSchema, zSchema } from "@/lib/zodSchema";
 import axios from "axios";
 
 const breadCrumbData = [
@@ -36,7 +36,7 @@ const breadCrumbData = [
 
 function AddCounpon() {
   //Form schema
-  const schema = zSchema
+  const schema = couponSchema
     .pick({
       code: true,
       discountPercentage: true,
