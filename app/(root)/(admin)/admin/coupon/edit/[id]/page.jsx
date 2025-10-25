@@ -26,6 +26,7 @@ import useFetch from "@/hooks/useFetch";
 import { useParams } from "next/navigation";
 import { couponSchema } from "@/lib/zodSchema";
 import ButtonLoading from "@/components/application/ButtonLoading";
+import dayjs from "dayjs";
 
 const breadCrumbData = [
   { href: ADMIN_DASHBOARD, label: "Home" },
@@ -66,7 +67,6 @@ function EditProduct() {
     },
   });
   
-  console.log(couponData);
   
 
   // ✅ Pre-fill form when coupon data loads
@@ -80,7 +80,7 @@ function EditProduct() {
         code: data.code,
         discountPercentage: data.discountPercentage,
         minShoppingAmount: data.minShoppingAmount,
-        validity: data.validity,
+        validity: dayjs(data.validity).format('YYYY/MM/DD'),
       });
     }
   }, [couponData]);
