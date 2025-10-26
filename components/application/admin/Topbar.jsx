@@ -5,12 +5,13 @@ import UserDropdown from "./UserDropdown";
 import { Button } from "@/components/ui/button";
 import { RiMenu4Fill } from "react-icons/ri";
 import { useSidebar } from "@/components/ui/sidebar";
+import AdminSearch from "./AdminSearch";
 
 const Topbar = () => {
   const { toggleSidebar } = useSidebar();
   return (
-    <div className="fixed border-b h-14 ps-6 pr-5 w-full md:w-[calc(100vw-16rem)] top-0 right-0 z-30  flex justify-between items-center bg-[var(--card)] dark:bg-[var(--card)]">
-      <div className="">Search component</div>
+    <div className="fixed border-b h-14  pr-5 ps-5 w-full dark:md:w-[calc(100vw-16rem)] md:w-[calc(100vw-18rem)] top-0 right-0 z-30  flex justify-between items-center bg-[var(--card)] dark:bg-[var(--card)]">
+      <div className=""><AdminSearch/></div>
       <div className="flex items-center gap-4">
         <ThemeSwitch />
         <UserDropdown />
