@@ -118,7 +118,7 @@ function EditProduct() {
       <BreadCrumb breadCrumbData={breadCrumbData} />
 
       <div className="w-full flex justify-center">
-        <Card className="w-[75%] shadow-2xl mt-20">
+        <Card className="md:w-[75%] w-full shadow-2xl md:mt-20 mt-5 ">
           <CardHeader>
             <CardTitle className="text-center text-3xl font-bold font-[Pacifico] text-primary">
               Edit Coupon

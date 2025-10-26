@@ -30,6 +30,7 @@ import Editor from "@/components/application/admin/Editor";
 import MediaModal from "@/components/application/admin/MediaModal";
 import Image from "next/image";
 import { sizes } from "@/lib/utils";
+import ButtonLoading from "@/components/application/ButtonLoading";
 
 const breadCrumbData = [
   {
@@ -60,6 +61,7 @@ function AddProduct() {
   const [productOption, setProductOption] = useState([]);
   const [open, setOpen] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState([]);
+  const [loading, setLoading] = useState(false);
   //Fetching categories
   const { data: productData } = useFetch(
     `/api/product?deleteType=SD&&size=10000`
@@ -111,6 +113,7 @@ function AddProduct() {
   // 2. Define a submit handler.
   async function onSubmit(data) {
     try {
+      setLoading(true);
       if (selectedMedia.length <= 0) {
         return showToast("error", "Please select media");
       }
@@ -130,20 +133,23 @@ function AddProduct() {
 
       showToast("success", response.message || "Product added successfully!");
       form.reset();
+      setLoading(false);
     } catch (error) {
       const errorMessage =
         error?.response?.data?.message ||
         error?.message ||
         "Something went wrong adding product";
       showToast("error", errorMessage);
+    } finally {
+      setLoading(false);
     }
   }
 
   return (
-    <div className="">
+    <div className="mb-100 md:mb-10">
       <BreadCrumb breadCrumbData={breadCrumbData} />
       <div className="w-full h-full flex  justify-center">
-        <Card className={`w-[75%] h-[45%] shadow-2xl my-5`}>
+        <Card className={`md:w-[75%] w-full h-[45%] shadow-2xl my-5`}>
           <CardHeader>
             <CardTitle
               className={`w-full text-3xl font-bold font-[Pacifico] text-primary`}
@@ -326,13 +332,11 @@ function AddProduct() {
                     <span className="">Select Media</span>
                   </div>
                 </div>
-
-                <Button
+                <ButtonLoading
                   type="submit"
-                  className={`md:col-span-2 w-50 rounded-full mt-4 block cursor-pointer`}
-                >
-                  Add Product Variant
-                </Button>
+                  text="Add Product Variant"
+                  loading={loading}
+                />
               </form>
             </Form>
           </CardContent>

@@ -38,7 +38,7 @@ const UploadMedia = ({ isMultiple, queryClient }) => {
           throw new Error(mediaUploadResponse.message);
         }
 
-        queryClient.invalidateQueries('media-data')
+        queryClient.invalidateQueries("media-data");
         showToast("success", mediaUploadResponse.message);
       } catch (error) {
         showToast("error", error.message);
@@ -47,29 +47,31 @@ const UploadMedia = ({ isMultiple, queryClient }) => {
   };
 
   return (
-    <CldUploadWidget
-      signatureEndpoint="/api/cloudinary-signature"
-      uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
-      onError={errorHandler}
-      onQueuesEnd={queuedHandler}
-      options={{
-        cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-        sources: ["local", "url", "unsplash", "google_drive"],
-        multiple: isMultiple,
-        maxFiles: 20,
-      }}
-    >
-      {({ open }) => (
-        <Button
-          type="button"
-          onClick={() => open?.()}
-          className="flex items-center gap-2"
-        >
-          <FiPlus />
-          Upload Media
-        </Button>
-      )}
-    </CldUploadWidget>
+    <div className=" ">
+      <CldUploadWidget
+        signatureEndpoint="/api/cloudinary-signature"
+        uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
+        onError={errorHandler}
+        onQueuesEnd={queuedHandler}
+        options={{
+          cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+          sources: ["local", "url", "unsplash", "google_drive"],
+          multiple: isMultiple,
+          maxFiles: 20,
+        }}
+      > 
+        {({ open }) => (
+          <Button
+            type="button"
+            onClick={() => open?.()}
+            className="flex items-center gap-2"
+          >
+            <FiPlus />
+            Upload Media
+          </Button>
+        )}
+      </CldUploadWidget>
+    </div>
   );
 };
 

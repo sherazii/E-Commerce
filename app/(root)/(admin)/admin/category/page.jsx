@@ -57,7 +57,7 @@ function ShowCategory() {
   }, []);
 
   return (
-    <div className="">
+    <div className="mb-100">
       <BreadCrumb breadCrumbData={breadCrumbData} />
       <Card className="py-0 rounded shadow-sm">
         <CardHeader className="pt-3 px-3 border-b [.border-b]:pb-2">
@@ -69,7 +69,7 @@ function ShowCategory() {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="pb-5">
+        <CardContent className="pb-5 w-90 md:w-full">
           <DatatableWrapper
             queryKey="category-data"
             fetchUrl="/api/category"

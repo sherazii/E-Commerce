@@ -69,7 +69,7 @@ function ShowCoupon() {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="pb-5">
+        <CardContent className="pb-5 w-100 md:w-full">
           <DatatableWrapper
             queryKey="coupon-data"
             fetchUrl="/api/coupon"

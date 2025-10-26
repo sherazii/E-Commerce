@@ -51,7 +51,7 @@ function ShowReview() {
             <h4 className="text-xl font-semibold">Reviews</h4>
           </div>
         </CardHeader>
-        <CardContent className="pb-5">
+        <CardContent className="pb-5 md:w-full w-100">
           <DatatableWrapper
             queryKey="reviews-data"
             fetchUrl="/api/reviews"

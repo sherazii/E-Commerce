@@ -10,7 +10,7 @@ const QuickAdd = () => {
   return (
     <div className="mt-10 grid lg:grid-cols-4 sm:grid-cols-2 sm:gap-10 gap-5 mx-auto  place-items-center">
       <Link href={ADMIN_CATEGORY_ADD}>
-        <div className="h-24 w-60 border rounded-2xl p-2 flex items-center justify-between  shadow-md  bg-radial-[at_25%_75%] from-green-300 via-green-400 to-green-600">
+        <div className="h-24 md:w-55 w-80 border rounded-2xl p-2 flex items-center justify-between  shadow-md  bg-radial-[at_25%_75%] from-green-300 via-green-400 to-green-600">
           <div className="flex flex-col gap-2">
             <h4 className="text-lg text-white">Add Category</h4>
           </div>
@@ -22,7 +22,7 @@ const QuickAdd = () => {
         </div>
       </Link>
       <Link href={ADMIN_PRODUCT_ADD}>
-        <div className="h-24 w-60 border rounded-2xl p-2 flex items-center justify-between  shadow-md bg-radial-[at_25%_75%] from-blue-300 via-blue-400 to-blue-600">
+        <div className="h-24 md:w-55 w-80 border rounded-2xl p-2 flex items-center justify-between  shadow-md bg-radial-[at_25%_75%] from-blue-300 via-blue-400 to-blue-600">
           <div className="flex flex-col gap-2">
             <h4 className="text-lg text-white">Add Products</h4>
           </div>
@@ -34,7 +34,7 @@ const QuickAdd = () => {
         </div>
       </Link>
       <Link href={ADMIN_COUPON_ADD}>
-        <div className="h-24 w-60 border rounded-2xl p-2 flex items-center justify-between  shadow-md bg-radial-[at_25%_75%] from-yellow-400 via-yellow-400 to-yellow-600">
+        <div className="h-24 md:w-55 w-80 border rounded-2xl p-2 flex items-center justify-between  shadow-md bg-radial-[at_25%_75%] from-yellow-400 via-yellow-400 to-yellow-600">
           <div className="flex flex-col gap-2">
             <h4 className="text-lg text-white">Add Coupon</h4>
           </div>
@@ -46,7 +46,7 @@ const QuickAdd = () => {
         </div>
       </Link>
       <Link href={ADMIN_MEDIA_SHOW}>
-        <div className="h-24 w-60 border rounded-2xl p-2 flex items-center justify-between  shadow-md bg-radial-[at_25%_75%] from-cyan-300 via-cyan-400 to-cyan-600">
+        <div className="h-24 md:w-55 w-80 border rounded-2xl p-2 flex items-center justify-between  shadow-md bg-radial-[at_25%_75%] from-cyan-300 via-cyan-400 to-cyan-600">
           <div className="flex flex-col gap-2">
             <h4 className="text-lg text-white">Upload Media</h4>
           </div>

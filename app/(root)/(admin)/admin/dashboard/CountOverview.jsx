@@ -14,7 +14,7 @@ const CountOverview = () => {
     <div className="mt-3 ">
     <div className="grid lg:grid-cols-4 sm:grid-cols-2 sm:gap-10 gap-5 mx-auto  place-items-center">
       <Link href={""}>
-        <div className="h-24 w-60 border rounded-2xl p-2 flex items-center justify-between border-l-10 border-l-green-400 shadow-md dark:bg-gray-600 bg-white">
+        <div className="h-24 md:w-55 w-80 border rounded-2xl p-2 flex items-center  justify-between border-l-10 border-l-green-400 shadow-md dark:bg-gray-600 bg-white">
           <div className="flex flex-col gap-2">
             <h4 className="text-lg text-gray-700 dark:text-gray-200">Total Categories</h4>
             <span className="text-xl font-bold">{count?.data?.category}</span>
@@ -27,7 +27,7 @@ const CountOverview = () => {
         </div>
       </Link>
       <Link href={""}>
-        <div className="h-24 w-60 border rounded-2xl p-2 flex items-center justify-between border-l-10 border-l-blue-400 shadow-md dark:bg-gray-600 bg-white">
+        <div className="h-24 md:w-55 w-80 border rounded-2xl p-2 flex items-center  justify-between border-l-10 border-l-blue-400 shadow-md dark:bg-gray-600 bg-white">
           <div className="flex flex-col gap-2">
             <h4 className="text-lg text-gray-700 dark:text-gray-200">Total Products</h4>
             <span className="text-xl font-bold">{count?.data?.product}</span>
@@ -40,7 +40,7 @@ const CountOverview = () => {
         </div>
       </Link>
       <Link href={""}>
-        <div className="h-24 w-60 border rounded-2xl p-2 flex items-center justify-between border-l-10 border-l-yellow-400 shadow-md dark:bg-gray-600 bg-white">
+        <div className="h-24 md:w-55 w-80 border rounded-2xl p-2 flex items-center  justify-between border-l-10 border-l-yellow-400 shadow-md dark:bg-gray-600 bg-white">
           <div className="flex flex-col gap-2">
             <h4 className="text-lg text-gray-700 dark:text-gray-200">Total Customers</h4>
             <span className="text-xl font-bold">{count?.data?.customer}</span>
@@ -53,7 +53,7 @@ const CountOverview = () => {
         </div>
       </Link>
       <Link href={""}>
-        <div className="h-24 w-60 border rounded-2xl p-2 flex items-center justify-between border-l-10 border-l-cyan-300 shadow-md dark:bg-gray-600 bg-white">
+        <div className="h-24 md:w-55 w-80 border rounded-2xl p-2 flex items-center  justify-between border-l-10 border-l-cyan-300 shadow-md dark:bg-gray-600 bg-white">
           <div className="flex flex-col gap-2">
             <h4 className="text-lg text-gray-700 dark:text-gray-200">Total Orders</h4>
             <span className="text-xl font-bold">76</span>

@@ -168,11 +168,11 @@ function EditProduct() {
   };
 
   return (
-    <div>
+    <div className="md:mb-20 mb-80">
       <BreadCrumb breadCrumbData={breadCrumbData} />
 
       <div className="w-full flex justify-center">
-        <Card className="w-[75%] shadow-2xl mt-20">
+        <Card className="md:w-[75%] w-full shadow-2xl md:mt-20 mt-5">
           <CardHeader>
             <CardTitle className="text-center text-3xl font-bold font-[Pacifico] text-primary">
               Edit Product
@@ -342,7 +342,7 @@ function EditProduct() {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="md:col-span-2 w-50 rounded-full mt-4 cursor-pointer"
+                  className="md:col-span-2 md:w-50 w-full rounded-full mt-4 cursor-pointer"
                 >
                   {loading ? "Updating..." : "Update Product"}
                 </Button>

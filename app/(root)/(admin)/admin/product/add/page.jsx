@@ -152,10 +152,10 @@ function AddProduct() {
   };
 
   return (
-    <div className="">
+    <div className="mb-100">
       <BreadCrumb breadCrumbData={breadCrumbData} />
       <div className="w-full h-full flex  justify-center">
-        <Card className={`w-[75%] h-[45%] shadow-2xl my-5`}>
+        <Card className={`md:w-[75%] w-full  shadow-2xl my-5`}>
           <CardHeader>
             <CardTitle
               className={`w-full text-3xl font-bold font-[Pacifico] text-primary`}

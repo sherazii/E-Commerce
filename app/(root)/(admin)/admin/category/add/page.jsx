@@ -91,7 +91,7 @@ function AddCategory() {
     <div className="">
       <BreadCrumb breadCrumbData={breadCrumbData} />
       <div className="w-full h-full flex  justify-center">
-        <Card className={`w-[75%] h-[45%] shadow-2xl mt-20`}>
+        <Card className={`md:w-[75%] md:h-[45%] w-full shadow-2xl mt-20`}>
           <CardHeader>
             <CardTitle
               className={`w-full text-center text-3xl font-bold font-[Pacifico] text-primary`}

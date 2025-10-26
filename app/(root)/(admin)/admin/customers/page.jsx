@@ -51,7 +51,7 @@ function ShowCustomers() {
             <h4 className="text-xl font-semibold">Customers</h4>
           </div>
         </CardHeader>
-        <CardContent className="pb-5">
+        <CardContent className="pb-5 md:w-full w-100">
           <DatatableWrapper
             queryKey="customers-data"
             fetchUrl="/api/customers"

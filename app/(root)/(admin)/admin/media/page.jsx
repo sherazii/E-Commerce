@@ -107,7 +107,7 @@ const MediaPage = () => {
   }, [selectAll, data]);
 
   return (
-    <div className="mb-5">
+    <div className="md:mb-5 mb-100 ">
       <BreadCrumb breadCrumbData={breadCrumbData} />
 
       <Card className="py-0 rounded shadow-md">

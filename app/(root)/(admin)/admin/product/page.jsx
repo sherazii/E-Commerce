@@ -57,9 +57,9 @@ function ShowProduct() {
   }, []);
 
   return (
-    <div className="">
+    <div className="mb-100">
       <BreadCrumb breadCrumbData={breadCrumbData} />
-      <Card className="py-0 rounded shadow-sm">
+      <Card className="py-0 rounded shadow-sm w-100 md:w-full">
         <CardHeader className="pt-3 px-3 border-b [.border-b]:pb-2">
           <div className="flex items-center justify-between">
             <h4 className="text-xl font-semibold">Products Details</h4>

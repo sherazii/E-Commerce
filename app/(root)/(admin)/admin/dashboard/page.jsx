@@ -12,7 +12,7 @@ import LatestReview from "./LatestReview";
 
 const AdminDashboard = () => {
   return (
-    <div className="my-3">
+    <div className="my-3 w-full">
       <CountOverview />
       <QuickAdd />
       <div className="mt-10 flex lg:flex-nowrap flex-wrap gap-10">
