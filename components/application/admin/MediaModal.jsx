@@ -14,6 +14,7 @@ import loading from "@/public/assets/images/loading.svg";
 import Media from "./Media";
 import ModalMediaBlock from "./ModalMediaBlock";
 import { showToast } from "@/lib/showToast";
+import ButtonLoading from "../ButtonLoading";
 
 const MediaModal = ({
   open,
@@ -22,8 +23,7 @@ const MediaModal = ({
   setSelectedMedia,
   isMultiple,
 }) => {
-  
-  const [prevSelected, setPrevSelected ] = useState([])
+  const [prevSelected, setPrevSelected] = useState([]);
   const fetchMedia = async (page) => {
     const { data: response } = await axios.get(
       `/api/media?page=${page}&&limit=18&&deleteType=SD`
@@ -55,19 +55,19 @@ const MediaModal = ({
 
   const handleClear = () => {
     setSelectedMedia([]);
-    setPrevSelected([])
-    showToast('success', 'Media Selection cleared.')
+    setPrevSelected([]);
+    showToast("success", "Media Selection cleared.");
   };
   const handleClose = () => {
     setSelectedMedia(prevSelected);
-    setOpen(false)
+    setOpen(false);
   };
   const handleSelect = () => {
-    if(selectedMedia.length <= 0){
-      return showToast('error', 'Please select a media')
+    if (selectedMedia.length <= 0) {
+      return showToast("error", "Please select a media");
     }
-    setPrevSelected(selectedMedia)
-    setOpen(false)
+    setPrevSelected(selectedMedia);
+    setOpen(false);
   };
 
   return (
@@ -108,6 +108,17 @@ const MediaModal = ({
                         isMultiple={isMultiple}
                       />
                     ))}
+                  {/* Optionally trigger fetchNextPage from UI or on scroll — left as-is */}
+                  <div className="flex items-center justify-center my-10 col-span-6">
+                    {hasNextPage && (
+                        <ButtonLoading
+                          type="button"
+                          loading={isFetching}
+                          onClick={() => fetchNextPage()}
+                          text="Load More"
+                        />
+                    )}
+                  </div>
                 </div>
               </>
             )}
