@@ -22,10 +22,10 @@ const Footer = () => {
           <Link href={WEBSITE_HOME}>
             <Image
               src={logo}
-              width={383}
-              height={146}
+              width={683}
+              height={246}
               alt="logo"
-              className="lg:w-32 w-24 "
+              className="lg:w-42 w-full "
             />
             <p className="text-gray-500 text-sm text-justify">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Sapiente

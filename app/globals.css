@@ -152,3 +152,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+.slick-dots{
+  bottom: 15px !important;
+}
