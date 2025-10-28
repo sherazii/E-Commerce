@@ -17,8 +17,7 @@ import userLogo from "@/public/assets/images/user.png";
 import { HiMiniBars3 } from "react-icons/hi2";
 const Header = () => {
   const auth = useSelector((state) => state.auth.auth);
-  const [isMobileMenu, setIsMobileMenu]  = useState(false);
-  
+  const [isMobileMenu, setIsMobileMenu] = useState(false);
 
   return (
     <div className="bg-white border-b lg:px-24 px-4">
@@ -33,17 +32,27 @@ const Header = () => {
           />
         </Link>
         <div className="flex justify-between gap-20 ">
-          <nav className={`lg:relative lg:w-auto lg:top-0 lg:left-0 lg:p-0 bg-white fixed top-0  w-full h-screen lg:h-auto ${isMobileMenu ? 'left-0' : '-left-full'} transition-all ease-in-out duration-300`}>
+          <nav
+            className={`lg:relative lg:w-auto lg:top-0 lg:left-0 lg:p-0 bg-white fixed top-0  w-full h-screen lg:h-auto ${
+              isMobileMenu ? "left-0" : "-left-full"
+            } transition-all ease-in-out duration-300 z-50`}
+          >
             <div className="lg:hidden flex justify-between items-center bg-gray-50 py-3 border-b px-3">
-                <Image
-            src={logo}
-            width={383}
-            height={146}
-            alt="logo"
-            className="lg:w-32 w-24 "
-          />
-          
-            <button type="button" ><IoMdClose size={25} className="text-gray-500 hover:text-primary" onClick={() => setIsMobileMenu(false)}/></button>
+              <Image
+                src={logo}
+                width={383}
+                height={146}
+                alt="logo"
+                className="lg:w-32 w-24 "
+              />
+
+              <button type="button">
+                <IoMdClose
+                  size={25}
+                  className="text-gray-500 hover:text-primary"
+                  onClick={() => setIsMobileMenu(false)}
+                />
+              </button>
             </div>
             <ul className="lg:flex justify-between items-center gap-10 px-3">
               <li className="text-gray-600 hover:text-primary hover:font-semibold">
@@ -93,11 +102,20 @@ const Header = () => {
             ) : (
               <Link href={USER_DASHBOARD}>
                 <Avatar>
-                    <AvatarImage src={userLogo.src}/>
+                  <AvatarImage src={userLogo.src} />
                 </Avatar>
               </Link>
             )}
-            <button type="button" className="lg:hidden block" onClick={() => setIsMobileMenu(true)}><HiMiniBars3 size={25} className="text-gray-500 hover:text-primary"/></button>
+            <button
+              type="button"
+              className="lg:hidden block"
+              onClick={() => setIsMobileMenu(true)}
+            >
+              <HiMiniBars3
+                size={25}
+                className="text-gray-500 hover:text-primary"
+              />
+            </button>
           </div>
         </div>
       </div>

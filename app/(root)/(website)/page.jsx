@@ -3,6 +3,7 @@ import Banner from "@/components/application/website/Banner";
 import FeaturedProduct from "@/components/application/website/FeaturedProduct";
 import Image from "next/image";
 import advertisingBanner from "@/public/assets/images/advertising-banner.png";
+import Testimonial from "@/components/application/website/Testimonial";
 
 const Home = () => {
   return (
@@ -24,6 +25,9 @@ const Home = () => {
           alt="advertisingBanner"
           className="h-full w-full object-cover"
         />
+      </section>
+      <section className="lg:px-32 px-4 sm:pt20 pt-5 pb-10">
+        <Testimonial />
       </section>
     </div>
   );

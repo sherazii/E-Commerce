@@ -53,7 +53,7 @@ const MainSlider = () => {
     ],
   };
   return (
-    <Slider {...settings} className="">
+    <Slider {...settings} className="z-0">
       <div>
         <Image
           src={slider1}
