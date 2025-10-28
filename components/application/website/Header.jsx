@@ -3,6 +3,7 @@ import {
   USER_DASHBOARD,
   WEBSITE_HOME,
   WEBSITE_LOGIN,
+  WEBSITE_SHOP,
 } from "@/routes/WebsiteRoute";
 import Image from "next/image";
 import Link from "next/link";
@@ -66,7 +67,7 @@ const Header = () => {
                 </Link>
               </li>
               <li className="text-gray-600 hover:text-primary hover:font-semibold">
-                <Link className="block py-2" href={""}>
+                <Link className="block py-2" href={WEBSITE_SHOP}>
                   Shop
                 </Link>
               </li>
