@@ -3,6 +3,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import { IoStar } from "react-icons/io5";
+import { RiChatQuoteLine } from "react-icons/ri";
 
 export const testimonials = [
   {
@@ -111,6 +112,7 @@ const Testimonial = () => {
       {testimonials.map((item, idx) => (
         <div key={idx} className="p-5">
           <div className="border rounded-lg p-5 w-full md:h-[35vh]  overflow-scroll no-scrollbar  my-10 md:text-[14px] text-[10px] text-justify">
+            <RiChatQuoteLine size={30}/>
             <p className="">{item.review}</p>
             <h4 className="font-semibold">{item.name}</h4>
             <div className="flex">

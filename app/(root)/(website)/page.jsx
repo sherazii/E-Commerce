@@ -4,6 +4,7 @@ import FeaturedProduct from "@/components/application/website/FeaturedProduct";
 import Image from "next/image";
 import advertisingBanner from "@/public/assets/images/advertising-banner.png";
 import Testimonial from "@/components/application/website/Testimonial";
+import ShoppingFeatures from "@/components/application/website/ShoppingFeatures";
 
 const Home = () => {
   return (
@@ -28,6 +29,9 @@ const Home = () => {
       </section>
       <section className="lg:px-32 px-4 sm:pt20 pt-5 pb-10">
         <Testimonial />
+      </section>
+      <section className="w-full border-t sm:pt20 py-10">
+        <ShoppingFeatures />
       </section>
     </div>
   );
