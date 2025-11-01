@@ -101,22 +101,23 @@ const Filter = () => {
   };
 
   // Handle size filter click
-  const handleSizeFilter = (size) => {
-    let newSelectedSize = [...selectedSize];
+const handleSizeFilter = (size) => {
+  let newSelectedSize = [...selectedSize];
 
-    newSelectedSize.includes(size)
-      ? (newSelectedSize = newSelectedSize.filter((s) => s !== size))
-      : newSelectedSize.push(size);
+  newSelectedSize.includes(size)
+    ? (newSelectedSize = newSelectedSize.filter((s) => s !== size))
+    : newSelectedSize.push(size);
 
-    setSelectedSize(newSelectedSize);
+  setSelectedSize(newSelectedSize);
 
-    // Update URL based on selection
-    newSelectedSize.length > 0
-      ? urlSearchParams.set("size", newSelectedSelectedSize.join(","))
-      : urlSearchParams.delete("size");
+  // Update URL based on selection
+  newSelectedSize.length > 0
+    ? urlSearchParams.set("size", newSelectedSize.join(","))
+    : urlSearchParams.delete("size");
 
-    router.push(`${WEBSITE_SHOP}?${urlSearchParams}`);
-  };
+  router.push(`${WEBSITE_SHOP}?${urlSearchParams}`);
+};
+
 
   //Handle price filter
   const handlePriceFilter = () => {
