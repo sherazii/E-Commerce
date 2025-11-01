@@ -75,9 +75,9 @@ export async function GET(request) {
               as: "variant",
               cond: {
                 $and: [
-                  size ? { $eq: ["$$variant.size", size] } : { $literal: true },
+                  size ? { $in: ["$$variant.size", size.split(',')] } : { $literal: true },
                   color
-                    ? { $eq: ["$$variant.color", color] }
+                    ? { $in: ["$$variant.color", color.split(',')] }
                     : { $literal: true },
                   { $gte: ["$$variant.sellingPrice", minPrice] },
                   { $lte: ["$$variant.sellingPrice", maxPrice] },
