@@ -16,9 +16,11 @@ import { useSelector } from "react-redux";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import userLogo from "@/public/assets/images/user.png";
 import { HiMiniBars3 } from "react-icons/hi2";
+import Search from "./Search";
 const Header = () => {
   const auth = useSelector((state) => state.auth.auth);
   const [isMobileMenu, setIsMobileMenu] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
 
   return (
     <div className="bg-white border-b lg:px-24 px-4">
@@ -89,7 +91,7 @@ const Header = () => {
             </ul>
           </nav>
           <div className="flex justify-between items-center gap-8">
-            <button type="button">
+            <button type="button" onClick={() => setShowSearch(!showSearch)}>
               <IoIosSearch
                 className="text-gray-500 hover:text-primary cursor-pointer"
                 size={25}
@@ -120,6 +122,7 @@ const Header = () => {
           </div>
         </div>
       </div>
+      <Search isShow={showSearch}/>
     </div>
   );
 };
