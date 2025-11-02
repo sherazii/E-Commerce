@@ -1,13 +1,15 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist";
-import authReducer from './reducer/authSlice'; // ✅ your auth slice
-import localStorage from "redux-persist/es/storage";
+import storage from "redux-persist/lib/storage"; // ✅ correct import
+import authReducer from "./reducer/authSlice";
+import cartReducer from "./reducer/cartSlice";
 
 /**
  * 🧩 Combine all reducers
  */
 const rootReducer = combineReducers({
   auth: authReducer,
+  cart: cartReducer,
 });
 
 /**
@@ -15,7 +17,7 @@ const rootReducer = combineReducers({
  */
 const persistConfig = {
   key: "root", // key for localStorage
-  storage: localStorage, // using localStorage as default
+  storage, // ✅ correct
 };
 
 /**
@@ -30,7 +32,7 @@ export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // ✅ disable serializable check for redux-persist
+      serializableCheck: false, // ✅ required for redux-persist
     }),
 });
 

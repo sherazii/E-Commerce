@@ -2,32 +2,34 @@ import axios from "axios";
 import React from "react";
 import ProductDetails from "./ProductDetails";
 
-const ProductPage = async ({ params, searchParams }) => {
-  const { slug } = params;
-  const { color, size } = searchParams;
+export default async function ProductPage({ params, searchParams }) {
 
-  // ✅ Fix env var spelling
+  // ✅ Await params and searchParams as required by Next.js
+  const { slug } = await params;
+  const { color, size } = await searchParams;
+
+  console.log("Slug:", slug, "Color:", color, "Size:", size);
+
   let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/product/details/${slug}`;
 
-  // ✅ Append filters if exist
-  if (color && size) {
-    url += `?color=${color}&size=${size}`;
-  }
+  // ✅ Append filters dynamically
+  const queryParams = new URLSearchParams();
+  if (color) queryParams.append("color", color);
+  if (size) queryParams.append("size", size);
+
+  if (queryParams.toString()) url += `?${queryParams.toString()}`;
 
   const { data: getProduct } = await axios.get(url);
-  if (!getProduct.success) {
+
+  if (!getProduct?.success) {
     return (
-      <div className="flex justify-center items-center py-10">
-        <h1 className="text-4xl font-semibold h-300">Data not found</h1>
+      <div className="flex justify-center items-center py-20">
+        <h1 className="text-3xl font-semibold text-red-500">Product Not Found</h1>
       </div>
     );
   }
 
-  const product = getProduct?.data?.products;
-  const variant = getProduct?.data?.variant;
-  const colors = getProduct?.data?.colors;
-  const sizes = getProduct?.data?.sizes;
-  const reviewCount = getProduct?.data?.reviewCount;
+  const { products: product, variant, colors, sizes, reviewCount } = getProduct.data;
 
   return (
     <ProductDetails
@@ -38,6 +40,4 @@ const ProductPage = async ({ params, searchParams }) => {
       reviewCount={reviewCount}
     />
   );
-};
-
-export default ProductPage;
+}

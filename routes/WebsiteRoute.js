@@ -6,4 +6,5 @@ export const WEBSITE_RESETPASSWORD = "/auth/reset-password";
 //User routes
 export const USER_DASHBOARD = "/my-account";
 export const WEBSITE_SHOP = "/shop";
+export const WEBSITE_CART = "/cart";
 export const WEBSITE_PRODUCT_DETAILS = (slug) => (slug ? `/product/${slug}` : "/product");
