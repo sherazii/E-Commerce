@@ -2,11 +2,12 @@ import Image from "next/image";
 import React from "react";
 import ImgPlaceholder from "@/public/assets/images/img-placeholder.webp";
 import Link from "next/link";
+import { WEBSITE_PRODUCT_DETAILS } from "@/routes/WebsiteRoute";
 
 const FeatureProductBox = ({ product }) => {
   return (
     <Link
-      href={`/product/${product?.slug || ""}`}
+      href={WEBSITE_PRODUCT_DETAILS(product.slug) || ""}
       className="group block rounded-2xl bg-white shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
     >
       {/* Image Wrapper */}
