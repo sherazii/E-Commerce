@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { IoStar } from "react-icons/io5";
 import ButtonLoading from "../ButtonLoading";
@@ -19,12 +19,38 @@ import { FormLabel, Rating } from "@mui/material";
 import axios from "axios";
 import { showToast } from "@/lib/showToast";
 import { reviewSchema } from "@/lib/zodSchema";
+import Link from "next/link";
+import { WEBSITE_LOGIN } from "@/routes/WebsiteRoute";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import ReviewList from "./ReviewList";
+import useFetch from "@/hooks/useFetch";
 
 const ProductReview = ({ productId }) => {
+  const queryClient = useQueryClient();
   const auth = useSelector((state) => state.auth);
   const userId = auth?.auth?._id;
+  const [reviewCount, setReviewCount] = useState();
+
+  const { data: reviewData } = useFetch(
+    `/api/reviews/details?productId=${productId}`
+  );
+
+  useEffect(() => {
+    if (reviewData && reviewData.success) {
+      const reviewCountData = reviewData.data;
+      setReviewCount(reviewCountData);
+    }
+  }, [reviewData]);
+  console.log(reviewCount);
+  
 
   const [loading, setLoading] = useState(false);
+  const [currentUrl, setCurrentUrl] = useState("");
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setCurrentUrl(window.location.href);
+    }
+  }, []);
   const formSchema = reviewSchema.pick({
     product: true,
     userid: true,
@@ -53,6 +79,7 @@ const ProductReview = ({ productId }) => {
       }
       form.reset();
       showToast("success", response.message);
+      queryClient.invalidateQueries("product-review");
     } catch (error) {
       const errorMessage =
         error?.response?.data?.message ||
@@ -63,6 +90,27 @@ const ProductReview = ({ productId }) => {
       setLoading(false);
     }
   }
+
+  // Fetch reviews
+  const fetchReview = async (pageParams) => {
+    const { data: getReviewData } = await axios.get(
+      `/api/reviews/get?productId=${productId}&page=${pageParams}`
+    );
+    if (!getReviewData.success) {
+      return;
+    }
+    return getReviewData.data;
+  };
+
+  // ✅ 2️⃣ Fix useInfiniteQuery setup
+  const { data, error, isFetching, fetchNextPage, hasNextPage } =
+    useInfiniteQuery({
+      queryKey: ["product-review"],
+      queryFn: async ({ pageParam = 0 }) => await fetchReview(pageParam),
+      initialPageParam: 0,
+      getNextPageParam: (lastPage) => lastPage?.nextPage ?? undefined,
+    });
+
   return (
     <div className="shadow rounded border">
       <div className="p-3 bg-gray-50 border-b">
@@ -73,7 +121,7 @@ const ProductReview = ({ productId }) => {
           {/* Rating & Reviews */}
           <div className="md:w-1/2 w-full md:flex md:gap-10 md:mb-0 mb-5">
             <div className="md:w-[200px] w-full md:mb-0 mb-5">
-              <h4 className="text-center text-8xl font-semibold">0.0</h4>
+              <h4 className="text-center text-8xl font-semibold">{reviewCount?.averageRating}</h4>
               <div className="flex justify-center gap-2">
                 <IoStar />
                 <IoStar />
@@ -91,8 +139,8 @@ const ProductReview = ({ productId }) => {
                       <p className="w-3">{rating}</p>
                       <IoStar />
                     </div>
-                    <Progress value={20 * rating} />
-                    <span className="text-sm">{20 * rating}</span>
+                    <Progress value={reviewCount?.percentage[rating]} />
+                    <span className="text-sm">{reviewCount?.rating[rating]}</span>
                   </div>
                 ))}
               </div>
@@ -109,61 +157,91 @@ const ProductReview = ({ productId }) => {
             </Button>
           </div>
         </div>
+
         {/* form */}
         <div className="my-10">
           <h4 className="text-xl font-semibold mb-3">Write a review</h4>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <FormField
-                control={form.control}
-                name="rating"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Rating value={field.value} size="large" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Title</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter Title" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="review"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Review</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Write your comment here..."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          {!auth ? (
+            <>
+              <p className="text-xl font-semibold">Login to submit review</p>
+              <Button asChild>
+                <Link href={`${WEBSITE_LOGIN}?callback=${currentUrl}`}>
+                  Login
+                </Link>
+              </Button>
+            </>
+          ) : (
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-8"
+              >
+                <FormField
+                  control={form.control}
+                  name="rating"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Rating value={field.value} size="large" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter Title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="review"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Review</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Write your comment here..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <ButtonLoading
-                type="submit"
-                text="Add Review"
-                loading={loading}
-                className={`w-32 cursor-pointer`}
-              />
-            </form>
-          </Form>
+                <ButtonLoading
+                  type="submit"
+                  text="Add Review"
+                  loading={loading}
+                  className={`w-32 cursor-pointer`}
+                />
+              </form>
+            </Form>
+          )}
+        </div>
+        <div className="mt-10 border-t pt-5">
+          <h5 className="text-xl font-semibold">
+            {data?.pages[0].totalReview || 0} Reviews
+          </h5>
+          <div className="mt-10">
+            {data &&
+              data.pages.map((page) =>
+                page.reviews.map((review) => (
+                  <div className="mb-3" key={review._id}>
+                    <ReviewList review={review} />
+                  </div>
+                ))
+              )}
+          </div>
         </div>
       </div>
     </div>
