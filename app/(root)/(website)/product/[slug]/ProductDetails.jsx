@@ -16,7 +16,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import imgPlaceholder from "@/public/assets/images/img-placeholder.webp";
 import { IoStar } from "react-icons/io5";
-import { decode } from "entities";
+import { decode, encode } from "entities";
 import { HiMinus, HiPlus } from "react-icons/hi2";
 import ButtonLoading from "@/components/application/ButtonLoading";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,6 +24,7 @@ import { addIntoCart } from "@/store/reducer/cartSlice";
 import { showToast } from "@/lib/showToast";
 import { Button } from "@/components/ui/button";
 import loadingSvg from "@/public/assets/images/loading.svg";
+import ProductReview from "@/components/application/website/ProductReview";
 
 const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
   const [activeThumb, setActiveThumb] = useState();
@@ -154,7 +155,7 @@ const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
           </div>
         </div>
 
-        {/* Details */}
+        {/* Product Info */}
         <div className="md:w-1/2 md:mt-0 mt-5">
           <h1 className="text-3xl font-semibold mb-2">{product.name}</h1>
 
@@ -218,9 +219,9 @@ const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
               {sizes.map((size) => (
                 <Link
                   onClick={() => setIsProductLoading(true)}
-                  href={`${WEBSITE_PRODUCT_DETAILS(
-                    product.slug
-                  )}?color=${variant.color}&size=${size}`}
+                  href={`${WEBSITE_PRODUCT_DETAILS(product.slug)}?color=${
+                    variant.color
+                  }&size=${size}`}
                   key={size}
                   className={`border py-1 px-3 rounded-lg cursor-pointer hover:bg-primary hover:text-white ${
                     size === variant.size ? "bg-primary text-white" : ""
@@ -285,6 +286,23 @@ const ProductDetails = ({ product, variant, colors, sizes, reviewCount }) => {
             </div>
           )}
         </div>
+      </div>
+      {/* Product Details section */}
+      <div className="mb-10">
+        <div className="shadow rounded border">
+          <div className="p-3 bg-gray-50 border-b">
+            <h2 className="font-semibold text-2xl">Product Details</h2>
+          </div>
+          <div className="p-3">
+            <div
+              dangerouslySetInnerHTML={{ __html: encode(product.description) }}
+            ></div>
+          </div>
+        </div>
+      </div>
+      {/* Rating & reviews section  */}
+      <div className="mb-10">
+        <ProductReview productId={product._id} />
       </div>
     </div>
   );
