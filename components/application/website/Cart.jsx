@@ -44,7 +44,7 @@ const Cart = () => {
         
         {cart?.count > 0 && <span className="absolute bg-red-500 text-white text-xs rounded-full w-4 h-4 flex justify-center items-center -right-2 -top-1 ">{cart.count}</span>}
       </SheetTrigger>
-      <SheetContent className={"md:min-w-[500px]"}>
+      <SheetContent className={"sm:min-w-[500px] w-full"}>
         <SheetHeader>
           <SheetTitle className="text-2xl">My Cart</SheetTitle>
           <SheetDescription></SheetDescription>
