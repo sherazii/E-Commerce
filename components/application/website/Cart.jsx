@@ -28,9 +28,10 @@ const Cart = () => {
     const cartProducts = cart.products;
     const totalAmount = cartProducts.reduce((sum, product)=> sum + (product.sellingPrice * product.qty),0).toFixed(2)
     const discount = cartProducts.reduce((sum, product)=> sum + ((product.mrp - product.sellingPrice) * product.qty),0).toFixed(2)
+    const finalPrice = (totalAmount-discount).toFixed(2)
     setSubtotal(totalAmount);
     setDiscount(discount);
-    setFinalPrice(totalAmount-discount);
+    setFinalPrice(finalPrice);
   },[cart])
 
   return (
