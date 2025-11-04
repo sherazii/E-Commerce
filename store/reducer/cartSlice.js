@@ -47,7 +47,7 @@ export const cartSlice = createSlice({
       const { productId, variantId } = action.payload;
       state.products = state.products.filter(
         (product) =>
-          product.productId === productId && product.variantId === variantId
+        !(product.productId === productId && product.variantId === variantId)
       );
       state.count = state.products.length;
     },
