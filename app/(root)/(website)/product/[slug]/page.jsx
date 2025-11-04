@@ -8,7 +8,6 @@ export default async function ProductPage({ params, searchParams }) {
   const { slug } = await params;
   const { color, size } = await searchParams;
 
-  console.log("Slug:", slug, "Color:", color, "Size:", size);
 
   let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/product/details/${slug}`;
 

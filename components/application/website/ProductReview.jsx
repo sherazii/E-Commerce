@@ -41,7 +41,6 @@ const ProductReview = ({ productId }) => {
       setReviewCount(reviewCountData);
     }
   }, [reviewData]);
-  console.log(reviewCount);
   
 
   const [loading, setLoading] = useState(false);
@@ -129,7 +128,7 @@ const ProductReview = ({ productId }) => {
                 <IoStar />
                 <IoStar />
               </div>
-              <p className="text-center mt-3">(0 Rating & Reviews)</p>
+              <p className="text-center mt-3">({reviewCount?.totalReview} Rating & Reviews)</p>
             </div>
             <div className="md:w-[calc(100%-200px)] flex items-center">
               <div className="w-full">
