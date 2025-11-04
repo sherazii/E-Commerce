@@ -15,20 +15,33 @@ import { Button } from "@/components/ui/button";
 import { removeFromCart } from "@/store/reducer/cartSlice";
 import Link from "next/link";
 import { WEBSITE_CART, WEBSITE_CART_CHECKOUT } from "@/routes/WebsiteRoute";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { showToast } from "@/lib/showToast";
 const Cart = () => {
   const cart = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
+  const [subtotal, setSubtotal] = useState(0);
+  const [discount, setDiscount] = useState(0);
+  const [finalPrice, setFinalPrice] = useState(0);
+  useEffect(() => {
+    const cartProducts = cart.products;
+    const totalAmount = cartProducts.reduce((sum, product)=> sum + (product.sellingPrice * product.qty),0).toFixed(2)
+    const discount = cartProducts.reduce((sum, product)=> sum + ((product.mrp - product.sellingPrice) * product.qty),0).toFixed(2)
+    setSubtotal(totalAmount);
+    setDiscount(discount);
+    setFinalPrice(totalAmount-discount);
+  },[cart])
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger>
+      <SheetTrigger className="relative hover:scale-105">
         <GiShoppingCart
           size={25}
           className="text-gray-500 hover:text-primary cursor-pointer"
         />
+        
+        {cart?.count > 0 && <span className="absolute bg-red-500 text-white text-xs rounded-full w-4 h-4 flex justify-center items-center -right-2 -top-1 ">{cart.count}</span>}
       </SheetTrigger>
       <SheetContent className={"md:min-w-[500px]"}>
         <SheetHeader>
@@ -36,7 +49,7 @@ const Cart = () => {
           <SheetDescription></SheetDescription>
         </SheetHeader>
         <div className="h-[calc(100vh-40px)] pb-10 pt-2">
-          <div className="h-[calc(100%-128px)] overflow-auto pe-2">
+          <div className="sm:h-[calc(100%-30%)] h-[calc(100%-40%)] overflow-auto pe-2">
             {cart?.count === 0 && (
               <>
                 <div className="h-full flex justify-center items-center text-xl font-semibold">
@@ -58,8 +71,8 @@ const Cart = () => {
                     className="w-20 h-20 rounded border"
                   />
                   <div className="">
-                    <h4 className="text-lg mb-1">{product.name}</h4>
-                    <p className="text-gray-500">
+                    <h4 className="md:text-lg mb-1 text-sm">{product.name}</h4>
+                    <p className="text-gray-500 text-sm">
                       {product.size}/{product.color}
                     </p>
                   </div>
@@ -81,7 +94,7 @@ const Cart = () => {
                   >
                     Remove
                   </button>
-                  <p className="text-sm ">
+                  <p className="text-[9px] sm:text-[16px]">
                     {product.qty}X{" "}
                     {product.sellingPrice.toLocaleString("en-PK", {
                       style: "currency",
@@ -92,20 +105,29 @@ const Cart = () => {
               </div>
             ))}
           </div>
-          <div className="h-32 border-t pt-5 px-3">
-            <h2 className="flex justify-between items-center text-lg font-semibold">
+          <div className="h-auto border-t pt-5">
+            <div className="border-b">
+
+            <h2 className="flex justify-between items-center text-lg font-semibold px-3">
               <span className="">Sub Total</span>
-              <span className="">0</span>
+              <span className="">{subtotal}</span>
             </h2>
-            <h2 className="flex justify-between items-center text-lg font-semibold">
+            <h2 className="flex justify-between items-center text-lg font-semibold px-3">
               <span className="">Discount</span>
-              <span className="">0</span>
+              <span className="">{discount}</span>
             </h2>
-            <div className="flex justify-between gap-10 mt-5 ">
+            </div>
+            <div className="border-b py-2 px-3">
+               <h2 className="flex justify-between items-center text-lg font-semibold ">
+              <span className="">Final Price</span>
+              <span className="">{finalPrice}</span>
+            </h2>
+            </div>
+            <div className="flex sm:flex-row flex-col justify-between gap-3 mt-5 px-3">
               <Button
                 type="button"
                 variant={"outline"}
-                className={"w-1/4"}
+                className={"sm:w-1/4 w-full"}
                 asChild
                 onClick={() => setOpen(false)}
               >
@@ -114,7 +136,7 @@ const Cart = () => {
               {cart.count ? (
                 <Button
                   type="button"
-                  className={"w-1/4"}
+                  className={"sm:w-1/4 w-full"}
                   asChild
                   onClick={() => setOpen(false)}
                 >
