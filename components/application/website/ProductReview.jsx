@@ -41,7 +41,6 @@ const ProductReview = ({ productId }) => {
       setReviewCount(reviewCountData);
     }
   }, [reviewData]);
-  
 
   const [loading, setLoading] = useState(false);
   const [currentUrl, setCurrentUrl] = useState("");
@@ -120,7 +119,9 @@ const ProductReview = ({ productId }) => {
           {/* Rating & Reviews */}
           <div className="md:w-1/2 w-full md:flex md:gap-10 md:mb-0 mb-5">
             <div className="md:w-[200px] w-full md:mb-0 mb-5">
-              <h4 className="text-center text-8xl font-semibold">{reviewCount?.averageRating}</h4>
+              <h4 className="text-center text-8xl font-semibold">
+                {reviewCount?.averageRating}
+              </h4>
               <div className="flex justify-center gap-2">
                 <IoStar />
                 <IoStar />
@@ -128,7 +129,9 @@ const ProductReview = ({ productId }) => {
                 <IoStar />
                 <IoStar />
               </div>
-              <p className="text-center mt-3">({reviewCount?.totalReview} Rating & Reviews)</p>
+              <p className="text-center mt-3">
+                ({reviewCount?.totalReview} Rating & Reviews)
+              </p>
             </div>
             <div className="md:w-[calc(100%-200px)] flex items-center">
               <div className="w-full">
@@ -139,7 +142,9 @@ const ProductReview = ({ productId }) => {
                       <IoStar />
                     </div>
                     <Progress value={reviewCount?.percentage[rating]} />
-                    <span className="text-sm">{reviewCount?.rating[rating]}</span>
+                    <span className="text-sm">
+                      {reviewCount?.rating[rating]}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -240,6 +245,14 @@ const ProductReview = ({ productId }) => {
                   </div>
                 ))
               )}
+            {hasNextPage && (
+              <ButtonLoading
+                type="button"
+                text="Load More"
+                onClick={() => fetchNextPage()}
+                loading={isFetching}
+              />
+            )}
           </div>
         </div>
       </div>
