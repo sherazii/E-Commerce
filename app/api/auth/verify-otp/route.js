@@ -66,7 +66,7 @@ export async function POST(request) {
      * 🧩 Step 5: Prepare user payload for JWT
      */
     const loggedInUserData = {
-      _id: getUser._id,
+      _id: getUser._id.toString(),
       role: getUser.role,
       name: getUser.name,
       avatar: getUser.avatar,

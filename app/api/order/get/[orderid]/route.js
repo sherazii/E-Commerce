@@ -1,6 +1,6 @@
 import { connectDB } from "@/lib/databaseConnection";
 import { catchError, response } from "@/lib/helperFunction";
-import orderModel from "@/models/OrderModel";
+import OrderModel from "@/models/OrderModel";
 import mongoose from "mongoose";
 
 // ✅ Get single order by ID
@@ -17,7 +17,7 @@ export async function GET(request, context) {
     }
 
     // ✅ Fetch order directly
-    const order = await orderModel.findById(orderid);
+    const order = await OrderModel.findById(orderid);
 
     if (!order) {
       return response(false, 404, "Order not found");

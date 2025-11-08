@@ -71,6 +71,6 @@ const orderSchema = new mongoose.Schema(
 );
 
 // Avoid model overwrite error in development
-const orderModel =
+const OrderModel =
   mongoose.models.Order || mongoose.model("Order", orderSchema, "orders");
-export default orderModel;
+export default OrderModel;
