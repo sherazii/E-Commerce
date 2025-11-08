@@ -17,18 +17,25 @@ import {
   FormItem,
   FormControl,
   FormMessage,
+  FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
 import { couponSchema, orderFormSchema } from "@/lib/zodSchema";
 import { showToast } from "@/lib/showToast";
-import { WEBSITE_PRODUCT_DETAILS, WEBSITE_SHOP } from "@/routes/WebsiteRoute";
+import {
+  WEBSITE_ORDER_DETAILS,
+  WEBSITE_PRODUCT_DETAILS,
+  WEBSITE_SHOP,
+} from "@/routes/WebsiteRoute";
 import { addIntoCart, clearCart } from "@/store/reducer/cartSlice";
 import useFetch from "@/hooks/useFetch";
 import { IoCloseCircle } from "react-icons/io5";
 import z from "zod";
 import { FaShippingFast } from "react-icons/fa";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useRouter } from "next/navigation";
 
 const breadCrumb = {
   title: "Checkout",
@@ -39,6 +46,7 @@ const CheckoutPage = () => {
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart);
   const auth = useSelector((state) => state.auth);
+  const router = useRouter();
 
   const [verifiedCartData, setVerifiedCartData] = useState([]);
   const [isCouponApplied, setIsCouponApplied] = useState(false);
@@ -98,7 +106,7 @@ const CheckoutPage = () => {
     setDiscount(discountAmount);
 
     // Final amount without coupon
-    setFinalAmount(subTotalAmount - discountAmount);
+    setFinalAmount(subTotalAmount);
 
     couponForm.setValue("minShoppingAmount", subTotalAmount);
   }, [cart]);
@@ -119,7 +127,7 @@ const CheckoutPage = () => {
       setCouponDiscount(calculatedCoupon);
 
       // ✅ Final Amount = subtotal - product discount - coupon discount
-      setFinalAmount(subtotal - discount - calculatedCoupon);
+      setFinalAmount(subtotal - calculatedCoupon);
 
       showToast("success", response.message);
       setCouponCode(couponForm.getValues("code"));
@@ -153,6 +161,7 @@ const CheckoutPage = () => {
       pincode: true,
       landmark: true,
       ordernote: true,
+      isCashOnDelivery: true,
     })
     .extend({
       userId: z.string().optional(),
@@ -170,6 +179,7 @@ const CheckoutPage = () => {
       pincode: "",
       landmark: "",
       ordernote: "",
+      isCashOnDelivery: false,
       userId: auth?.auth?._id ?? "", // Use nullish coalescing operator
     },
   });
@@ -177,8 +187,26 @@ const CheckoutPage = () => {
   const onPlaceOrder = async (formData) => {
     setPlacingOrder(true);
     try {
-      console.log(formData);
+      const { data: paymentResponse } = await axios.post(
+        "/api/payment/save-order",
+        {
+          formData,
+          verifiedCartData,
+          subtotal,
+          discount,
+          couponDiscount,
+          finalAmount,
+        }
+      );
+      if (!paymentResponse.success) {
+        showToast("error", "Placing order failed");
+      }
+
       orderForm.reset();
+      dispatch(clearCart());
+      setFinalAmount(0);
+      showToast("success", "Order Placed successfully");
+      router.push(WEBSITE_ORDER_DETAILS(paymentResponse?.data?.orderId));
     } catch (error) {
       showToast("error", error.message);
     } finally {
@@ -341,6 +369,25 @@ const CheckoutPage = () => {
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={orderForm.control}
+                    name="isCashOnDelivery"
+                    render={({ field }) => (
+                      <FormItem className="col-span-2 border flex items-center gap-2 p-2">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel className="font-semibold cursor-pointer">
+                          Cash on delivery *
+                        </FormLabel>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
                   <div className="mb-3">
                     <ButtonLoading
                       type={"submit"}
@@ -371,7 +418,7 @@ const CheckoutPage = () => {
                             width={60}
                             height={60}
                             alt={product.name}
-                            className="rounded"
+                            className="rounded w-20"
                           />
                           <div>
                             <h4 className="font-medium line-clamp-1">

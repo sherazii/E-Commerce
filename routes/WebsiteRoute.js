@@ -9,3 +9,5 @@ export const WEBSITE_SHOP = "/shop";
 export const WEBSITE_CART = "/cart";
 export const WEBSITE_CART_CHECKOUT = "/checkout";
 export const WEBSITE_PRODUCT_DETAILS = (slug) => (slug ? `/product/${slug}` : "/product");
+
+export const WEBSITE_ORDER_DETAILS =(order_id) =>  `/order-details/${order_id}`;
