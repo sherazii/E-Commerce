@@ -13,6 +13,7 @@ const breadCrumbData = {
   title: "Dashboard",
   links: [{ label: "Dashboard" }],
 };
+
 const MyAccount = () => {
   const { data: dashboardData } = useFetch("/api/dashboard/user");
 

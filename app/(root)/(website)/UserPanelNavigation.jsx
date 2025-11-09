@@ -46,17 +46,17 @@ const UserPanelNavigation = () => {
         </li>
         <li className="mb-2">
           <Link
-            href={USER_DASHBOARD}
+            href={USER_PROFILE}
             className={`block p-3 text-sm rounded hover:bg-primary hover:text-white ${
               pathname.startsWith(USER_PROFILE) ? "bg-primary text-white" : ""
             }`}
           >
             Profile
           </Link>
-        </li>
+        </li> 
         <li className="mb-2">
           <Link
-            href={USER_DASHBOARD}
+            href={USER_ORDERS}
             className={`block p-3 text-sm rounded hover:bg-primary hover:text-white ${
               pathname.startsWith(USER_ORDERS) ? "bg-primary text-white" : ""
             }`}
