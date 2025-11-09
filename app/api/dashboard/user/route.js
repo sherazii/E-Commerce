@@ -18,7 +18,7 @@ export async function GET(request) {
 
     //get recent orders
     const recentOrders = await OrderModel.find({userId: userId}).lean()
-    const totalOrderCount = await OrderModel.countDocuments({user: userId})
+    const totalOrderCount = await OrderModel.countDocuments({userId: userId})
 
 
     return response(true, 200, 'Dashboard infos', {recentOrders, totalOrderCount})
