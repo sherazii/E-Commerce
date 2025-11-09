@@ -65,7 +65,7 @@ const Header = () => {
                 </Link>
               </li>
               <li className="text-gray-600 hover:text-primary hover:font-semibold">
-                <Link className="block py-2" href={""}>
+                <Link className="block py-2" href={"/about-us"}>
                   About
                 </Link>
               </li>
@@ -75,17 +75,17 @@ const Header = () => {
                 </Link>
               </li>
               <li className="text-gray-600 hover:text-primary hover:font-semibold">
-                <Link className="block py-2" href={""}>
+                <Link className="block py-2" href={`${WEBSITE_SHOP}?category=t-shirt`}>
                   T-Shirt
                 </Link>
               </li>
               <li className="text-gray-600 hover:text-primary hover:font-semibold">
-                <Link className="block py-2" href={""}>
+                <Link className="block py-2" href={`${WEBSITE_SHOP}?category=hoodies`}>
                   Hoodies
                 </Link>
               </li>
               <li className="text-gray-600 hover:text-primary hover:font-semibold">
-                <Link className="block py-2" href={""}>
+                <Link className="block py-2" href={`${WEBSITE_SHOP}?category=oversized`}>
                   Oversized
                 </Link>
               </li>

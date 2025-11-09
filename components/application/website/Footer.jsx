@@ -3,9 +3,11 @@ import Link from "next/link";
 import React from "react";
 import logo from "@/public/assets/images/logo-black.svg";
 import {
+  USER_DASHBOARD,
   WEBSITE_HOME,
   WEBSITE_LOGIN,
   WEBSITE_REGISTER,
+  WEBSITE_SHOP,
 } from "@/routes/WebsiteRoute";
 import { FaLocationDot } from "react-icons/fa6";
 import { IoMdCall } from "react-icons/io";
@@ -39,27 +41,27 @@ const Footer = () => {
           <h4 className="text-xl font-bold uppercase mb-5">Categories</h4>
           <ul className="flex flex-col ">
             <li className="text-gray-600 hover:text-primary hover:font-semibold">
-              <Link className="block py-1" href={""}>
+              <Link className="block py-1" href={`${WEBSITE_SHOP}?category=t-shirt`}>
                 T-Shirt
               </Link>
             </li>
             <li className="text-gray-600 hover:text-primary hover:font-semibold">
-              <Link className="block py-1" href={""}>
+              <Link className="block py-1" href={`${WEBSITE_SHOP}?category=hoodies`}>
                 Hoodies
               </Link>
             </li>
             <li className="text-gray-600 hover:text-primary hover:font-semibold">
-              <Link className="block py-1" href={""}>
+              <Link className="block py-1" href={`${WEBSITE_SHOP}?category=oversized`}>
                 Oversized
               </Link>
             </li>
             <li className="text-gray-600 hover:text-primary hover:font-semibold">
-              <Link className="block py-1" href={""}>
+              <Link className="block py-1" href={`${WEBSITE_SHOP}?category=full-sleeves`}>
                 Full sleeves
               </Link>
             </li>
             <li className="text-gray-600 hover:text-primary hover:font-semibold">
-              <Link className="block py-1" href={""}>
+              <Link className="block py-1" href={`${WEBSITE_SHOP}?category=polo`}>
                 Polo
               </Link>
             </li>
@@ -74,12 +76,12 @@ const Footer = () => {
               </Link>
             </li>
             <li className="text-gray-600 hover:text-primary hover:font-semibold">
-              <Link className="block py-1" href={""}>
+              <Link className="block py-1" href='/about-us'>
                 About
               </Link>
             </li>
             <li className="text-gray-600 hover:text-primary hover:font-semibold">
-              <Link className="block py-1" href={""}>
+              <Link className="block py-1" href={WEBSITE_SHOP}>
                 Shop
               </Link>
             </li>
@@ -109,17 +111,17 @@ const Footer = () => {
               </Link>
             </li>
             <li className="text-gray-600 hover:text-primary hover:font-semibold">
-              <Link className="block py-1" href={WEBSITE_HOME}>
+              <Link className="block py-1" href={USER_DASHBOARD}>
                 My Account
               </Link>
             </li>
             <li className="text-gray-600 hover:text-primary hover:font-semibold">
-              <Link className="block py-1" href={WEBSITE_HOME}>
+              <Link className="block py-1" href='/privacy-policy'>
                 Privacy Policy
               </Link>
             </li>
             <li className="text-gray-600 hover:text-primary hover:font-semibold">
-              <Link className="block py-1" href={WEBSITE_HOME}>
+              <Link className="block py-1" href='/terms-and-conditions'>
                 Terms & Conditions
               </Link>
             </li>

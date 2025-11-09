@@ -47,10 +47,10 @@ const MyAccount = () => {
               </div>
             </div>
             {/* Table of orders  */}
-            <div className="mt-5">
+            <div className="mt-5 overflow-auto">
               <h4 className="text-lg font-semibold mb-3">Recent Orders</h4>
               {dashboardData?.data?.recentOrders?.length > 0 ? (
-                <table className="w-full border rounded-lg overflow-hidden">
+                <table className="w-full border rounded-lg overflow-auto">
                   <thead>
                     <tr>
                       <th className="text-start p-2 text-sm border-b text-nowrap text-gray-500">
