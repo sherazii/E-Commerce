@@ -19,6 +19,7 @@ import { HiMiniBars3 } from "react-icons/hi2";
 import Search from "./Search";
 const Header = () => {
   const auth = useSelector((state) => state.auth.auth);
+  
   const [isMobileMenu, setIsMobileMenu] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
 
@@ -105,7 +106,7 @@ const Header = () => {
             ) : (
               <Link href={USER_DASHBOARD}>
                 <Avatar>
-                  <AvatarImage src={userLogo.src} />
+                  <AvatarImage src={auth?.avatar?.url || userLogo.src} />
                 </Avatar>
               </Link>
             )}
