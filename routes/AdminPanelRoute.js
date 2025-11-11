@@ -36,3 +36,7 @@ export const ADMIN_COUPON_EDIT = (id) => (id ? `/admin/coupon/edit/${id}` : "");
 export const ADMIN_CUSTOMERS_SHOW = "/admin/customers";
 //Customers routes
 export const ADMIN_REVIEWS_SHOW = "/admin/review";
+
+// Orders routes 
+export const ADMIN_ORDERS_SHOW = "/admin/orders";
+export const ADMIN_ORDERS_DETAILS = (order_id) => (order_id ? `/admin/orders/details/${order_id}` : "");
