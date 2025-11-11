@@ -23,6 +23,8 @@ const orderProductSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    
+    deletedAt: { type: Date, default: null, index: true }, 
   },
   { _id: false }
 );
@@ -66,6 +68,8 @@ const orderSchema = new mongoose.Schema(
       enum: ["pending","processing", "shipped", "delivered", "cancelled", "unverified"],
       default: "pending",
     },
+    
+    deletedAt: { type: Date, default: null, index: true }, 
   },
   { timestamps: true }
 );
