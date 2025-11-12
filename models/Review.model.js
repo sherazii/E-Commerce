@@ -33,5 +33,7 @@ const reviewSchema = new mongoose.Schema(
 );
 
 // ✅ Fix: *force overwrite* model cache in Next.js
-export default mongoose.models?.Review ||
-  mongoose.model("Review", reviewSchema);
+const ReviewModel =
+  mongoose.models?.Review || mongoose.model("Review", reviewSchema, "reviews");
+
+export default ReviewModel;

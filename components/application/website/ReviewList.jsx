@@ -6,7 +6,6 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 dayjs.extend(relativeTime)
 
 const ReviewList = ({ review }) => {
-  // console.log(review);
 
   return (
     <div className="flex gap-5 border-b border-gray-200 pb-6 mb-6">

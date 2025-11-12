@@ -4,7 +4,6 @@ import ProductModel from "@/models/product.model";
 import "@/models/media.model"; // ✅ Register Media model
 
 export async function GET() {
-  console.log('trigger');
   
   try {
       await connectDB();

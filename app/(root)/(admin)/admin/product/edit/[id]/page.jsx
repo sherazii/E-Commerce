@@ -135,7 +135,6 @@ function EditProduct() {
 
   // ✅ Update product handler
   const productUpdateHandler = async (data) => {
-    console.log("trigger"); // should now appear in console
     setLoading(true);
 
     try {

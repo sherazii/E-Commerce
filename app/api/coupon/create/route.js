@@ -20,7 +20,6 @@ export async function POST(request) {
 
     // ✅ Parse request body
     const payload = await request.json();
-    console.log("[COUPON PAYLOAD]:", payload);
 
     // ✅ Form schema
     const schema = couponSchema

@@ -147,7 +147,6 @@ const CheckoutPage = () => {
     setFinalAmount(subtotal - discount);
   };
 
-  // console.log(couponForm.formState.errors);
 
   // ✅ Extend base schema with userId
   const orderSchema = orderFormSchema

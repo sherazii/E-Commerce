@@ -35,7 +35,6 @@ const OrderDetails = ({ params }) => {
   const { data, loading, error } = useFetch(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/order/get/${orderid}`
   );
-  console.log(data);
   
 
   useEffect(() => {
