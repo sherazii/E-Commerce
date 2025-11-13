@@ -5,12 +5,13 @@ import { IoIosArrowRoundForward } from "react-icons/io";
 import FeatureProductBox from "./FeatureProductBox";
 
 const FeaturedProduct = async () => {
-  const { data: productData } = await axios.get(
-    `/api/product/getFeaturedProduct`
-  );
-  
+  const baseURL =
+    process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3000/api"; // fallback for local dev
 
-//   if (!productData) return null;  
+  const { data: productData } = await axios.get(
+    `${baseURL}/product/getFeaturedProduct`
+  );
+  //   if (!productData) return null;
   return (
     <>
       <div className="flex justify-between items-center mb-5">
@@ -24,7 +25,7 @@ const FeaturedProduct = async () => {
           View All <IoIosArrowRoundForward />
         </Link>
       </div>
-      <div className="grid md:grid-cols-4 grid-cols-1 sm:gap-10 gap-4 place-items-center">
+      <div className="grid md:grid-cols-4 grid-cols-2 sm:gap-10 gap-2 place-items-center">
         {!productData.success && (
           <>
             <div className="text-center py-5 col-span-4">Data not found</div>
@@ -32,7 +33,7 @@ const FeaturedProduct = async () => {
         )}
         {productData.success &&
           productData.data.map((product) => (
-            <FeatureProductBox product={product} key={product?._id}/>
+            <FeatureProductBox product={product} key={product?._id} />
           ))}
       </div>
     </>
