@@ -24,7 +24,7 @@ const FeaturedProduct = async () => {
           View All <IoIosArrowRoundForward />
         </Link>
       </div>
-      <div className="grid md:grid-cols-4 grid-cols-2 sm:gap-10 gap-2 place-items-center">
+      <div className="grid md:grid-cols-4 grid-cols-1 sm:gap-10 gap-4 place-items-center">
         {!productData.success && (
           <>
             <div className="text-center py-5 col-span-4">Data not found</div>

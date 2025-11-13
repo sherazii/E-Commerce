@@ -1,4 +1,5 @@
 "use client";
+
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
@@ -82,52 +83,68 @@ const Testimonial = () => {
   const settings = {
     dots: true,
     infinite: true,
-    speed: 500,
+    speed: 600,
     autoplay: true,
-    slidesToShow: 4,
+    autoplaySpeed: 3000,
+    slidesToShow: 3,
     slidesToScroll: 1,
     responsive: [
       {
-        breakpoint: 480,
+        breakpoint: 640, // mobile
         settings: {
-          dots: false,
+          slidesToShow: 1,
           arrows: false,
-
-          slidesToShow: 2,
+          dots: false,
         },
       },
       {
-        breakpoint: 780,
+        breakpoint: 768, // sm
         settings: {
-          dots: false,
+          slidesToShow: 2,
           arrows: false,
-
+          dots: true,
+        },
+      },
+      {
+        breakpoint: 1024, // md
+        settings: {
           slidesToShow: 3,
+          arrows: true,
+          dots: true,
+        },
+      },
+      {
+        breakpoint: 1280, // lg
+        settings: {
+          slidesToShow: 4,
+          arrows: true,
+          dots: true,
         },
       },
     ],
   };
+
   return (
-    <Slider {...settings} className="">
-      {testimonials.map((item, idx) => (
-        <div key={idx} className="p-5">
-          <div className="border rounded-lg p-5 w-full md:h-[35vh]  overflow-scroll no-scrollbar  my-10 md:text-[14px] text-[10px] text-justify">
-            <RiChatQuoteLine size={30}/>
-            <p className="">{item.review}</p>
-            <h4 className="font-semibold">{item.name}</h4>
-            <div className="flex">
-              {Array.from({ length: item.rating }).map((_, i) => (
-                <IoStar
-                  key={`Star${i}`}
-                  className="text-yellow-400"
-                  size={20}
-                />
-              ))}
+    <div className="px-4 md:px-10 my-10">
+      <Slider {...settings}>
+        {testimonials.map((item, idx) => (
+          <div key={idx} className="p-4">
+            <div className="border rounded-xl p-6 shadow-md bg-white hover:shadow-lg transition-all duration-300 h-full flex flex-col justify-between">
+              <RiChatQuoteLine className="text-gray-400 mb-3" size={30} />
+              <p className="text-gray-700 text-sm md:text-base flex-1 mb-4 whitespace-pre-line">
+                {item.review}
+              </p>
+              <h4 className="font-semibold text-gray-900">{item.name}</h4>
+              <div className="flex mt-2">
+                {Array.from({ length: item.rating }).map((_, i) => (
+                  <IoStar key={i} className="text-yellow-400" size={18} />
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      ))}
-    </Slider>
+        ))}
+      </Slider>
+    </div>
   );
 };
 
