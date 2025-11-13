@@ -18,8 +18,7 @@ const OrderDetails = ({ params }) => {
         setLoading(true);
         setError(null);
 
-        const apiUrl = `${process.env.NEXT_PUBLIC_API_BASE_URL}/order/get/${orderid}`;
-        const { data } = await axios.get(apiUrl);
+        const { data } = await axios.get(`/api/order/get/${orderid}`);
 
         if (!data.success) {
           setError(data.message || "Order not found");

@@ -15,7 +15,6 @@ import {
   ADMIN_DASHBOARD,
   ADMIN_TRASH,
 } from "@/routes/AdminPanelRoute";
-import axios from "axios";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FiPlus } from "react-icons/fi";
