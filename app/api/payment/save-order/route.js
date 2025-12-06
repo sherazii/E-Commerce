@@ -33,19 +33,22 @@ export async function POST(request) {
     // ✅ Validate formData with Zod (customer / shipping/billing info only)
     const schema = orderFormSchema.pick({
       name: true,
-      email: true,
+      address: true,
       phone: true,
+      email: true,
+      isCashOnDelivery: true,
       country: true,
       state: true,
       city: true,
       pincode: true,
       landmark: true,
       ordernote: true,
-      isCashOnDelivery: true,
       userId: true,
     });
 
     const validate = schema.safeParse(formData);
+
+    console.log(validate.success);
 
     if (!validate.success) {
       return response(false, 400, "Invalid or missing fields", validate.error);
@@ -54,9 +57,9 @@ export async function POST(request) {
     const validatedOrderInfo = validate.data;
 
     const orderPayload = {
-      ...validatedOrderInfo, 
+      ...validatedOrderInfo,
 
-      products: verifiedCartData, 
+      products: verifiedCartData,
       subtotal,
       discount,
       couponDiscount,
